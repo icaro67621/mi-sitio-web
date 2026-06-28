@@ -1,18 +1,271 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
- <meta charset="UTF-8" />
- <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
- <title>Mi Sitio Web</title>
- <style>
-   body { font-family: Arial, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; }
-   h1 { color: #2c3e50; }
-   p  { color: #555; line-height: 1.6; }
- </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PsicoAnatips - Psicología · Bienestar · Conexión</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; color: #3d2b2b; background: #fff; }
+
+    /* NAV */
+    nav { background: #fff; padding: 14px 40px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #f0e8e8; position: sticky; top: 0; z-index: 100; }
+    .logo { color: #c07070; font-size: 20px; letter-spacing: 1px; }
+    .logo span { color: #3d2b2b; }
+    .nav-links { display: flex; gap: 24px; font-size: 14px; font-family: sans-serif; }
+    .nav-links a { color: #5a4040; text-decoration: none; transition: color .2s; }
+    .nav-links a:hover, .nav-links a.active { color: #c07070; }
+    .btn-cta { background: #c07070; color: #fff; border: none; border-radius: 20px; padding: 9px 20px; font-size: 13px; cursor: pointer; font-family: sans-serif; }
+
+    /* HERO */
+    .hero { background: linear-gradient(135deg, #fdf6f0 60%, #fce8e8 100%); padding: 80px 60px; display: flex; align-items: center; gap: 40px; }
+    .hero-text { max-width: 480px; }
+    .hero-text h1 { font-size: 52px; color: #3d2b2b; line-height: 1.15; font-weight: 400; }
+    .hero-text h1 span { color: #c07070; }
+    .tagline { color: #c07070; font-style: italic; font-size: 20px; margin: 10px 0 18px; }
+    .hero-text p { font-family: sans-serif; font-size: 15px; color: #6b5050; line-height: 1.7; margin-bottom: 28px; }
+    .hero-img { flex: 1; display: flex; justify-content: center; }
+    .hero-blob { width: 340px; height: 340px; background: #f5d5c8; border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%; display: flex; align-items: center; justify-content: center; font-size: 90px; }
+    .btn-outline { border: 2px solid #c07070; color: #c07070; background: none; border-radius: 24px; padding: 11px 26px; font-size: 14px; cursor: pointer; font-family: sans-serif; transition: all .2s; }
+    .btn-outline:hover { background: #c07070; color: #fff; }
+
+    /* FEATURES BAR */
+    .features { background: #fff; padding: 24px 60px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; border-top: 1px solid #f0e8e8; border-bottom: 1px solid #f0e8e8; }
+    .feat { text-align: center; padding: 12px; }
+    .feat-icon { font-size: 28px; margin-bottom: 8px; }
+    .feat p { font-size: 13px; color: #7a6060; line-height: 1.5; font-family: sans-serif; }
+
+    /* SERVICES */
+    .section { padding: 60px; }
+    .section-bg { background: #fafafa; }
+    .section-title { text-align: center; font-size: 28px; color: #3d2b2b; margin-bottom: 40px; font-weight: 400; }
+    .section-title span { color: #c07070; }
+    .services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+    .service-card { background: #fdf6f0; border-radius: 16px; padding: 28px 20px; text-align: center; transition: transform .2s; }
+    .service-card:hover { transform: translateY(-4px); }
+    .service-card .s-icon { font-size: 36px; margin-bottom: 14px; }
+    .service-card h3 { font-size: 16px; color: #3d2b2b; margin-bottom: 8px; }
+    .service-card p { font-size: 13px; color: #7a6060; line-height: 1.6; font-family: sans-serif; }
+    .service-card a { color: #c07070; font-size: 13px; font-family: sans-serif; text-decoration: none; display: inline-block; margin-top: 12px; }
+
+    /* ABOUT */
+    .about { background: #fdf6f0; padding: 60px; display: flex; gap: 48px; align-items: flex-start; }
+    .about-img-wrap { width: 200px; height: 260px; background: #e8c5b5; border-radius: 100px 100px 80px 80px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 60px; }
+    .about-text h2 { font-size: 28px; color: #3d2b2b; margin-bottom: 4px; }
+    .about-subtitle { color: #c07070; font-style: italic; margin-bottom: 16px; font-size: 16px; }
+    .about-text p { font-family: sans-serif; font-size: 14px; color: #6b5050; line-height: 1.8; max-width: 420px; }
+    .tags { display: flex; flex-direction: column; gap: 10px; margin-left: auto; min-width: 220px; }
+    .tag { background: #fff; border-radius: 24px; padding: 10px 18px; font-size: 13px; color: #7a6060; font-family: sans-serif; border: 1px solid #f0d8d0; }
+
+    /* TESTIMONIAL */
+    .testimonial { background: #3d2b2b; padding: 60px 40px; text-align: center; }
+    .quote { font-size: 18px; color: #f5e8e8; font-style: italic; line-height: 1.8; max-width: 600px; margin: 0 auto; }
+    .quote footer { font-size: 13px; color: #c07070; margin-top: 16px; font-style: normal; font-family: sans-serif; }
+
+    /* RESOURCES */
+    .resources { padding: 60px; background: #fff; }
+    .resources h2 { font-size: 24px; color: #3d2b2b; margin-bottom: 28px; }
+    .resource-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .resource-card { background: #fdf6f0; border-radius: 16px; padding: 28px; }
+    .resource-card h4 { font-size: 16px; color: #3d2b2b; margin-bottom: 10px; }
+    .resource-card p { font-size: 13px; color: #7a6060; font-family: sans-serif; line-height: 1.6; }
+
+    /* NEWSLETTER */
+    .newsletter { background: #f5e8e8; padding: 48px 60px; display: flex; align-items: center; justify-content: space-between; gap: 32px; }
+    .newsletter h3 { font-size: 22px; color: #3d2b2b; margin-bottom: 6px; }
+    .newsletter p { font-size: 14px; color: #7a6060; font-family: sans-serif; }
+    .nl-form { display: flex; gap: 10px; }
+    .nl-form input { border: 1px solid #e0c8c8; border-radius: 24px; padding: 10px 20px; font-size: 14px; width: 260px; outline: none; font-family: sans-serif; }
+    .nl-form button { background: #c07070; color: #fff; border: none; border-radius: 24px; padding: 10px 22px; font-size: 14px; cursor: pointer; font-family: sans-serif; }
+
+    /* FOOTER */
+    footer { background: #3d2b2b; padding: 48px 60px 28px; }
+    .footer-grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1.2fr; gap: 32px; margin-bottom: 32px; }
+    .footer-col h4 { color: #c07070; font-size: 13px; margin-bottom: 14px; font-family: sans-serif; text-transform: uppercase; letter-spacing: .5px; }
+    .footer-col a, .footer-col p { display: block; color: #c8b0b0; font-size: 13px; font-family: sans-serif; text-decoration: none; margin-bottom: 7px; line-height: 1.6; }
+    .footer-col a:hover { color: #f5e8e8; }
+    .footer-logo-text { color: #f5e8e8; font-size: 18px; margin-bottom: 8px; }
+    .footer-bottom { border-top: 1px solid #5a4040; padding-top: 20px; display: flex; align-items: center; justify-content: space-between; }
+    .footer-copy { color: #8a7070; font-size: 12px; font-family: sans-serif; }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .hero { flex-direction: column; padding: 40px 24px; }
+      .hero-blob { width: 200px; height: 200px; font-size: 54px; }
+      .features, .services-grid, .resource-cards { grid-template-columns: 1fr 1fr; }
+      .about { flex-direction: column; padding: 40px 24px; }
+      .tags { margin-left: 0; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+      .newsletter { flex-direction: column; text-align: center; }
+      .section { padding: 40px 24px; }
+      nav { padding: 12px 20px; }
+      .nav-links { display: none; }
+    }
+  </style>
 </head>
 <body>
- <h1>Bienvenido a mi sitio web</h1>
- <p>Este es mi primer sitio web profesional.</p>
- <p>Aquí puedes editar tu contenido fácilmente.</p>
+
+<!-- NAVEGACIÓN -->
+<nav>
+  <div class="logo">psico<span>anatips</span></div>
+  <div class="nav-links">
+    <a href="#inicio" class="active">Inicio</a>
+    <a href="#sobre-mi">Sobre mí</a>
+    <a href="#servicios">Servicios</a>
+    <a href="#recursos">Recursos</a>
+    <a href="#podcast">Podcast</a>
+    <a href="#talleres">Talleres</a>
+    <a href="#contacto">Contacto</a>
+  </div>
+  <button class="btn-cta">Agenda tu cita</button>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="inicio">
+  <div class="hero-text">
+    <h1>Reconecta<br><span>contigo.</span> ♡</h1>
+    <p class="tagline">Vive con propósito y equilibrio</p>
+    <p>Acompañamiento psicológico para mujeres que buscan bienestar emocional, autoestima y una vida más consciente.</p>
+    <button class="btn-outline">Conoce mis servicios →</button>
+  </div>
+  <div class="hero-img">
+    <div class="hero-blob">🌸</div>
+  </div>
+</section>
+
+<!-- CARACTERÍSTICAS -->
+<div class="features">
+  <div class="feat"><div class="feat-icon">💻</div><p>Psicoterapia online y presencial</p></div>
+  <div class="feat"><div class="feat-icon">🔬</div><p>Enfoque científico y humano</p></div>
+  <div class="feat"><div class="feat-icon">❤️</div><p>Terapias basadas en evidencia</p></div>
+  <div class="feat"><div class="feat-icon">🔒</div><p>Espacio seguro y confidencial</p></div>
+</div>
+
+<!-- SERVICIOS -->
+<section class="section section-bg" id="servicios">
+  <h2 class="section-title">¿Cómo puedo <span>acompañarte?</span></h2>
+  <div class="services-grid">
+    <div class="service-card">
+      <div class="s-icon">🧠</div>
+      <h3>Psicoterapia individual</h3>
+      <p>Acompañamiento personalizado para gestionar emociones, creencias y desafíos de la vida.</p>
+      <a href="#">Ver más →</a>
+    </div>
+    <div class="service-card">
+      <div class="s-icon">🌿</div>
+      <h3>Bienestar emocional</h3>
+      <p>Programas y herramientas para fortalecer tu autonomía, manejo del estrés y bienestar integral.</p>
+      <a href="#">Ver más →</a>
+    </div>
+    <div class="service-card">
+      <div class="s-icon">🎙️</div>
+      <h3>Caos y Café (Podcast)</h3>
+      <p>Conversaciones honestas sobre salud mental, consciencia y crecimiento personal.</p>
+      <a href="#" id="podcast">Escuchar →</a>
+    </div>
+    <div class="service-card">
+      <div class="s-icon">🌸</div>
+      <h3>Talleres y programas</h3>
+      <p>Espacios grupales y programas para reconectar contigo y vivir con intención.</p>
+      <a href="#" id="talleres">Ver más →</a>
+    </div>
+  </div>
+</section>
+
+<!-- SOBRE MÍ -->
+<section class="about" id="sobre-mi">
+  <div class="about-img-wrap">👩‍⚕️</div>
+  <div class="about-text">
+    <h2>Hola, soy Ana ♡</h2>
+    <p class="about-subtitle">Psicóloga clínica, investigadora y apasionada por el bienestar emocional.</p>
+    <p>Llevo más de 12 años ayudando a mujeres en su proceso de transformación personal. Mi enfoque integra la ciencia psicológica con empatía, la autenticidad y el compromiso para reconectar contigo y vivir tu vida más plena.</p>
+    <button class="btn-outline" style="margin-top:20px; font-size:13px;">Conóceme más →</button>
+  </div>
+  <div class="tags">
+    <span class="tag">Terapia Cognitivo Conductual</span>
+    <span class="tag">Terapia de tercera generación (ACT, Mindfulness)</span>
+    <span class="tag">Psiconutrición y desarrollo personal</span>
+    <span class="tag">Autoestima y desarrollo personal</span>
+  </div>
+</section>
+
+<!-- TESTIMONIO -->
+<div class="testimonial">
+  <blockquote class="quote">
+    "Ana me ayudó a encontrarme, sanar y crecer y verme con más cariño. Su acompañamiento fue transformador, cálido y profesional, cálido y transformador."
+    <footer>— Paciente</footer>
+  </blockquote>
+</div>
+
+<!-- RECURSOS -->
+<section class="resources" id="recursos">
+  <h2>Recursos gratuitos para ti</h2>
+  <div class="resource-cards">
+    <div class="resource-card">
+      <h4>🎙️ Podcast: Caos y Café</h4>
+      <p>Episodios semanales sobre salud mental, autoestima y crecimiento personal con perspectiva científica.</p>
+    </div>
+    <div class="resource-card">
+      <h4>📘 Guías y talleres</h4>
+      <p>Materiales descargables y reflexiones para acompañar tu proceso de transformación personal.</p>
+    </div>
+    <div class="resource-card">
+      <h4>📱 Comunidad online</h4>
+      <p>Únete y recibe herramientas, tips y recursos cada semana directamente en tu correo.</p>
+    </div>
+  </div>
+</section>
+
+<!-- NEWSLETTER -->
+<section class="newsletter" id="contacto">
+  <div>
+    <h3>¡Bienvenida a Reconectarte!</h3>
+    <p>Suscríbete y accede a recursos exclusivos, herramientas, reflexiones y mucho más.</p>
+  </div>
+  <div class="nl-form">
+    <input type="email" placeholder="Escribe tu correo aquí" />
+    <button>Suscribirme</button>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-col">
+      <div class="footer-logo-text">psicoanatips</div>
+      <p>Psicología · Bienestar · Conexión</p>
+      <p style="margin-top:10px;">Medellín, Colombia</p>
+      <p>info@psicoanatips.com</p>
+      <p>+57 316 533-4567</p>
+    </div>
+    <div class="footer-col">
+      <h4>Enlace rápido</h4>
+      <a href="#sobre-mi">Sobre mí</a>
+      <a href="#servicios">Servicios</a>
+      <a href="#talleres">Talleres y programas</a>
+      <a href="#podcast">Podcast</a>
+      <a href="#contacto">Contacto</a>
+    </div>
+    <div class="footer-col">
+      <h4>Temas</h4>
+      <a href="#">Autoestima</a>
+      <a href="#">Maternidad consciente</a>
+      <a href="#">Salud mental</a>
+      <a href="#">Relaciones personales</a>
+      <a href="#">Crecimiento personal</a>
+    </div>
+    <div class="footer-col">
+      <h4>Contacto</h4>
+      <p>info@psicoanatips.com</p>
+      <p>+57 316 533-4567</p>
+      <p>Medellín, Colombia</p>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span style="color:#f5e8e8; font-size:16px;">psicoanatips</span>
+    <span class="footer-copy">© 2025 PsicoAnatips. Todos los derechos reservados.</span>
+  </div>
+</footer>
+
 </body>
 </html>
