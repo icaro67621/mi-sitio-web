@@ -4,67 +4,15 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sobre mí - PsicoAnatips</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: Georgia, serif; color: #3d2b2b; background: #fff; }
-
-    nav { background: #fff; padding: 14px 40px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #f0e8e8; position: sticky; top: 0; z-index: 100; }
-    .logo { color: #c07070; font-size: 20px; letter-spacing: 1px; }
-    .logo span { color: #3d2b2b; }
-    .nav-links { display: flex; gap: 24px; font-size: 14px; font-family: sans-serif; }
-    .nav-links a { color: #5a4040; text-decoration: none; transition: color .2s; }
-    .nav-links a:hover, .nav-links a.active { color: #c07070; }
-    .btn-cta { background: #c07070; color: #fff; border: none; border-radius: 20px; padding: 9px 20px; font-size: 13px; cursor: pointer; font-family: sans-serif; }
-
-    .hero-sobre { background: linear-gradient(135deg, #fdf6f0 60%, #fce8e8 100%); padding: 60px; display: flex; align-items: center; gap: 48px; }
-    .foto-wrap { width: 220px; height: 280px; background: #e8c5b5; border-radius: 110px 110px 90px 90px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 80px; }
-    .hero-text h1 { font-size: 42px; color: #3d2b2b; font-weight: 400; margin-bottom: 6px; }
-    .hero-text .titulo { color: #c07070; font-style: italic; font-size: 18px; margin-bottom: 20px; }
-    .hero-text p { font-family: sans-serif; font-size: 15px; color: #6b5050; line-height: 1.8; max-width: 520px; margin-bottom: 16px; }
-    .btn-outline { border: 2px solid #c07070; color: #c07070; background: none; border-radius: 24px; padding: 11px 26px; font-size: 14px; cursor: pointer; font-family: sans-serif; transition: all .2s; text-decoration: none; display: inline-block; margin-top: 10px; }
-    .btn-outline:hover { background: #c07070; color: #fff; }
-
-    .section { padding: 60px; }
-    .section-bg { background: #fafafa; }
-    .section-title { font-size: 26px; color: #3d2b2b; margin-bottom: 32px; font-weight: 400; }
-    .section-title span { color: #c07070; }
-
-    .enfoques { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
-    .enfoque-card { background: #fdf6f0; border-radius: 16px; padding: 24px; }
-    .enfoque-card .icon { font-size: 30px; margin-bottom: 12px; }
-    .enfoque-card h3 { font-size: 16px; color: #3d2b2b; margin-bottom: 8px; }
-    .enfoque-card p { font-size: 13px; color: #7a6060; line-height: 1.6; font-family: sans-serif; }
-
-    .especialidades { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 8px; }
-    .tag { background: #fff; border: 1px solid #f0d8d0; border-radius: 24px; padding: 10px 18px; font-size: 13px; color: #7a6060; font-family: sans-serif; }
-
-    .datos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; text-align: center; }
-    .dato { background: #fdf6f0; border-radius: 16px; padding: 28px 20px; }
-    .dato .num { font-size: 36px; color: #c07070; margin-bottom: 8px; }
-    .dato p { font-size: 13px; color: #7a6060; font-family: sans-serif; line-height: 1.5; }
-
-    .cta { background: #3d2b2b; padding: 60px; text-align: center; }
-    .cta h2 { font-size: 28px; color: #f5e8e8; margin-bottom: 12px; font-weight: 400; }
-    .cta p { color: #c8b0b0; font-family: sans-serif; font-size: 15px; margin-bottom: 28px; }
-    .btn-cta-lg { background: #c07070; color: #fff; border: none; border-radius: 24px; padding: 14px 32px; font-size: 15px; cursor: pointer; font-family: sans-serif; text-decoration: none; display: inline-block; }
-
-    footer { background: #3d2b2b; padding: 28px 60px; border-top: 1px solid #5a4040; }
-    .footer-bottom { display: flex; align-items: center; justify-content: space-between; }
-    .footer-copy { color: #8a7070; font-size: 12px; font-family: sans-serif; }
-
-    @media (max-width: 768px) {
-      .hero-sobre { flex-direction: column; padding: 40px 24px; }
-      .enfoques, .datos { grid-template-columns: 1fr; }
-      .section { padding: 40px 24px; }
-      nav { padding: 12px 20px; }
-      .nav-links { display: none; }
-    }
-  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="cyber.css" />
 </head>
 <body>
 
 <nav>
-  <div class="logo"><a href="index.html" style="text-decoration:none; color:inherit;">psico<span>anatips</span></a></div>
+  <div class="logo"><a href="index.html">psico<span>anatips</span></a></div>
   <div class="nav-links">
     <a href="index.html">Inicio</a>
     <a href="sobre-mi.html" class="active">Sobre mí</a>
@@ -77,8 +25,7 @@
 
 <section class="hero-sobre">
   <div class="foto-wrap">
-  <img src="ana-luisa-gil-alfonsi-1775595311.jpeg" alt="Ana Luisa Gil Alfonsi" 
-  style="width:100%; height:100%; object-fit:cover; border-radius: 110px 110px 90px 90px;"/>
+  <img src="ana-luisa-gil-alfonsi-1775595311.jpeg" alt="Ana Luisa Gil Alfonsi" />
 </div>
   <div class="hero-text">
     <h1>Ana Luisa Gil Alfonsi ♡</h1>
@@ -159,10 +106,11 @@
 
 <footer>
   <div class="footer-bottom">
-    <span style="color:#f5e8e8; font-size:16px;">psicoanatips</span>
+    <span class="footer-brand">psicoanatips</span>
     <span class="footer-copy">© 2025 PsicoAnatips. Todos los derechos reservados.</span>
   </div>
 </footer>
 
+<script src="cyber.js"></script>
 </body>
 </html>
