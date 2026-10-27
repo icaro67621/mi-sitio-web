@@ -7,18 +7,23 @@ set -euo pipefail
 
 cd "$(git rev-parse --show-toplevel)"
 
-BASE="lab-vuln-baseline"
+# Referencia del estado vulnerable base. Puede ser una etiqueta o una rama,
+# local o remota (origin/). Se usa la primera que exista.
+NAME="lab-vuln-baseline"
+BASE=""
+for ref in "refs/tags/$NAME" "refs/heads/$NAME" "refs/remotes/origin/$NAME"; do
+  if git rev-parse -q --verify "$ref" >/dev/null; then BASE="$ref"; break; fi
+done
 
-if git rev-parse -q --verify "refs/tags/$BASE" >/dev/null; then
-  # Restaura los archivos del lab desde la etiqueta del estado vulnerable.
-  git checkout "$BASE" -- ciberseguridad/lab
-  echo "✔ Laboratorio restaurado al estado vulnerable (desde la etiqueta $BASE)."
-else
-  echo "No existe la etiqueta '$BASE'."
-  echo "Si aun no has hecho commit de la remediacion, puedes descartar los cambios con:"
+if [ -z "$BASE" ]; then
+  echo "No encuentro la referencia base '$NAME' (ni etiqueta ni rama)."
+  echo "Si aun NO has hecho commit de la remediacion, descarta los cambios con:"
   echo "    git restore ciberseguridad/lab"
+  echo "Si ya la publicaste, trae la rama base con:  git fetch origin $NAME"
   exit 1
 fi
 
+git checkout "$BASE" -- ciberseguridad/lab
+echo "✔ Laboratorio restaurado al estado vulnerable (desde $BASE)."
 echo "Revisa el estado con:  git status"
 echo "Para publicar de nuevo el estado vulnerable, haz commit y push de ciberseguridad/lab."
