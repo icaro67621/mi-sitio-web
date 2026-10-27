@@ -4,16 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex, nofollow" />
-  <title>VulnBank · Demo vulnerable</title>
+  <title>VulnBank · Demo (versión remediada)</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800&family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/ciberseguridad/ciber.css" />
 
-  <!-- VULN (librería de terceros desactualizada / SCA): jQuery 1.7.2 tiene
-       CVE conocidos. VULN (sin SRI): se carga sin atributo integrity. -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-
+  <!-- Remediado: sin jQuery vulnerable. Los scripts propios se cargan desde
+       el propio origen y funcionan bajo una CSP estricta. -->
   <script src="/ciberseguridad/lab/assets/config.js"></script>
   <script src="/ciberseguridad/lab/assets/app.js"></script>
 </head>
@@ -28,10 +26,9 @@
 
 <section class="hero hero-small">
   <div class="hero-text">
-    <p class="kicker">&gt; demo bancaria de entrenamiento</p>
+    <p class="kicker">&gt; demo bancaria de entrenamiento · versión remediada</p>
     <h1>Vuln<span>Bank</span></h1>
-    <!-- VULN (XSS por DOM desde la URL): este banner se rellena con el
-         fragmento de la URL mediante innerHTML (ver app.js). -->
+    <!-- Remediado: el banner se rellena con textContent (ver app.js). -->
     <div id="banner" class="section-sub"></div>
   </div>
 </section>
@@ -39,10 +36,11 @@
 <section class="section">
   <div class="grid">
     <!-- Acceso -->
-    <div class="card" id="acceso">
+    <div class="card">
       <span class="badge">ACCESO</span>
       <h3>Entrar</h3>
-      <form onsubmit="return VulnBank.login(this)">
+      <!-- Remediado: sin credenciales en el cliente; se valida en el servidor. -->
+      <form id="form-login">
         <p><input name="usuario" placeholder="Usuario" autocomplete="off"></p>
         <p><input name="clave" type="password" placeholder="Contraseña" autocomplete="off"></p>
         <p><button class="btn btn-primary" type="submit">Iniciar sesión</button></p>
@@ -54,9 +52,9 @@
     <div class="card">
       <span class="badge">BUSCAR</span>
       <h3>Buscar movimientos</h3>
-      <!-- VULN (XSS por DOM): el resultado se pinta con innerHTML. -->
-      <form onsubmit="return VulnBank.buscar(this)">
-        <p><input name="q" placeholder="Ej: transferencia"></p>
+      <!-- Remediado: el resultado se pinta con textContent. -->
+      <form id="form-buscar">
+        <p><input id="q" name="q" placeholder="Ej: transferencia"></p>
         <p><button class="btn btn-ghost" type="submit">Buscar</button></p>
       </form>
       <div id="resultado" class="section-sub"></div>
@@ -66,28 +64,26 @@
     <div class="card">
       <span class="badge">CUOTAS</span>
       <h3>Calculadora de cuotas</h3>
-      <!-- VULN (eval): evalúa la expresión del usuario. -->
-      <form onsubmit="return VulnBank.calcular(this)">
-        <p><input name="expr" placeholder="Ej: 1000/12"></p>
+      <!-- Remediado: evaluador aritmético acotado, sin eval. -->
+      <form id="form-calc">
+        <p><input id="expr" name="expr" placeholder="Ej: 1000/12"></p>
         <p><button class="btn btn-ghost" type="submit">Calcular</button></p>
       </form>
       <div id="calc-out" class="section-sub"></div>
     </div>
   </div>
 
-  <!-- Panel tras "login" -->
-  <div class="card" id="panel" hidden style="margin-top:22px">
-    <span class="badge">PANEL</span>
-    <h3 id="hola">Panel privado</h3>
-    <p>Saldo de la cuenta demo: <strong>$ 12.480.000 COP</strong> (dato ficticio).</p>
-    <!-- VULN (target="_blank" sin rel="noopener"): reverse tabnabbing. -->
-    <p><a href="https://owasp.org/www-community/attacks/Reverse_Tabnabbing" target="_blank">Ver documentación de soporte</a></p>
+  <div class="card mt-22">
+    <span class="badge">RECURSOS</span>
+    <h3>Documentación</h3>
+    <!-- Remediado: enlace externo con rel="noopener noreferrer". -->
+    <p><a href="https://owasp.org/www-project-top-ten/" target="_blank" rel="noopener noreferrer">OWASP Top 10</a></p>
   </div>
 </section>
 
 <footer>
   <span class="brand">VULN<span>BANK</span></span>
-  <small>Demo vulnerable a propósito · datos y secretos ficticios</small>
+  <small>Demo de entrenamiento · versión remediada</small>
 </footer>
 
 </body>

@@ -276,3 +276,10 @@ footer small { font-family: var(--font-mono); color: var(--muted); font-size: 13
   .hero::before, .globe, .globe .core, .kicker::after { animation: none; }
   * { transition: none !important; }
 }
+
+/* ---------- UTILIDADES (lab) ---------- */
+.card-narrow { max-width: 860px; margin: 0 auto; }
+.card-danger { border-color: var(--red); }
+.mt-22 { margin-top: 22px; }
+.mt-14 { margin-top: 14px; }
+.steps { padding-left: 20px; line-height: 2; color: var(--text); }

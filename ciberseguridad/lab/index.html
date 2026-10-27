@@ -26,9 +26,9 @@
 <!-- HERO -->
 <section class="hero hero-small">
   <div class="hero-text">
-    <p class="kicker">&gt; root@secops:~$ scan ./vulnbank</p>
+    <p class="kicker">&gt; root@secops:~$ ./vulnbank</p>
     <h1>Lab de <span>Remediación</span></h1>
-    <p>Un mini-sitio <strong>vulnerable a propósito</strong> para enseñar, en clase, cómo detectar y remediar fallos de seguridad. Incluye librerías desactualizadas, secretos (ficticios) en el código y patrones que detectan las herramientas SAST/SCA.</p>
+    <p>Un mini-sitio para enseñar, en clase, cómo detectar y remediar fallos de seguridad. Se despliega en dos versiones: una <strong>vulnerable</strong> (para practicar) y una <strong>limpia</strong> (remediada).</p>
     <div class="hero-actions">
       <a class="btn btn-primary" href="/ciberseguridad/lab/app.html">Abrir VulnBank Demo</a>
       <a class="btn btn-ghost" href="#como">Cómo usarlo</a>
@@ -38,37 +38,27 @@
 
 <!-- AVISO -->
 <section class="section">
-  <div class="card" style="max-width:860px;margin:0 auto;border-color:var(--red)">
+  <div class="card card-narrow card-danger">
     <span class="badge red">AVISO</span>
-    <h3>Entorno de entrenamiento — vulnerable a propósito</h3>
-    <p>Esta aplicación contiene fallos de seguridad <strong>intencionales</strong> con fines educativos. Todos los "secretos" (claves de API, contraseñas, tokens) son <strong>inventados y no funcionan</strong>. No introduzcas aquí datos reales ni credenciales verdaderas.</p>
+    <h3>Entorno de entrenamiento</h3>
+    <p>En su <strong>versión vulnerable</strong>, esta aplicación contiene fallos de seguridad <strong>intencionales</strong> con fines educativos; todos los "secretos" son <strong>ficticios</strong> y no funcionan. No introduzcas aquí datos reales ni credenciales verdaderas.</p>
   </div>
 </section>
 
-<!-- QUÉ CONTIENE -->
+<!-- VERSIONES -->
 <section class="section section-alt">
-  <h2 class="section-title">Qué vas a <span>encontrar</span></h2>
-  <p class="section-sub">Categorías de fallos sembrados en el laboratorio.</p>
+  <h2 class="section-title">Dos <span>versiones</span></h2>
+  <p class="section-sub">El mismo laboratorio se publica en el estado que necesites.</p>
   <div class="grid">
     <div class="card">
-      <div class="icon">📦</div>
-      <h3>Librerías de terceros vulnerables (SCA)</h3>
-      <p>Dependencias con versiones de CVE conocidas declaradas en <code>package.json</code> y una librería antigua cargada en la página.</p>
+      <span class="badge red">VULNERABLE</span>
+      <h3>Para practicar</h3>
+      <p>Contiene las 11 vulnerabilidades documentadas en el manual: secretos, XSS, eval, librerías desactualizadas y malas configuraciones.</p>
     </div>
     <div class="card">
-      <div class="icon">🔑</div>
-      <h3>Secretos hardcodeados (ficticios)</h3>
-      <p>Claves de API, contraseña de base de datos y secreto de firma dentro del código fuente, para practicar con escáneres de secretos.</p>
-    </div>
-    <div class="card">
-      <div class="icon">🐞</div>
-      <h3>Patrones SAST</h3>
-      <p>XSS por DOM, uso de <code>eval()</code>, aleatoriedad insegura, autenticación en el cliente y enlaces sin <code>rel="noopener"</code>.</p>
-    </div>
-    <div class="card">
-      <div class="icon">⚙️</div>
-      <h3>Malas configuraciones</h3>
-      <p>Cabeceras de seguridad débiles en la ruta del lab y recurso cargado sin integridad (SRI).</p>
+      <span class="badge">LIMPIA</span>
+      <h3>Remediada</h3>
+      <p>Las mismas funciones, con todos los fallos corregidos: sin secretos en el cliente, salidas seguras, sin eval, dependencias parcheadas y CSP estricta.</p>
     </div>
   </div>
 </section>
@@ -76,15 +66,15 @@
 <!-- CÓMO USARLO -->
 <section class="section" id="como">
   <h2 class="section-title">Cómo usarlo en <span>clase</span></h2>
-  <div class="card" style="max-width:860px;margin:0 auto">
-    <ol style="padding-left:20px;line-height:2;color:var(--text)">
-      <li>Parte del estado <strong>vulnerable</strong> (el que ves ahora).</li>
-      <li>Pásale la carpeta <code>ciberseguridad/lab/</code> a Claude y pídele que detecte y remedie los fallos.</li>
-      <li>Revisa con tus estudiantes el antes/después y verifica con tu escáner (SAST/SCA/secretos).</li>
-      <li>Para volver a empezar, restaura el estado vulnerable:
-        <br><code>bash ciberseguridad/lab/reset-lab.sh</code></li>
+  <div class="card card-narrow">
+    <ol class="steps">
+      <li>Despliega la <strong>versión vulnerable</strong>: <code>bash tools/switch-lab.sh vuln</code> y publica.</li>
+      <li>Pásale la carpeta <code>ciberseguridad/lab/</code> a Claude y pídele detectar y remediar los fallos.</li>
+      <li>Revisa el antes/después con tus estudiantes y verifica con tu escáner (SAST/SCA/secretos).</li>
+      <li>Vuelve a la <strong>versión limpia</strong> o a la vulnerable cuando quieras:
+        <br><code>bash tools/switch-lab.sh clean</code> · <code>bash tools/switch-lab.sh vuln</code></li>
     </ol>
-    <p style="margin-top:14px">La guía del instructor con la lista completa de fallos y su remediación está en <code>ciberseguridad/lab/INSTRUCTOR.md</code> (no se publica como página).</p>
+    <p class="mt-14">La guía del instructor y el manual completo listan los fallos y su remediación (no se publican como páginas).</p>
   </div>
 </section>
 

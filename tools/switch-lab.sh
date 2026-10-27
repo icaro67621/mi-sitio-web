@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+# Cambia el laboratorio entre la versión VULNERABLE y la LIMPIA (remediada).
+#
+# Uso:
+#   bash tools/switch-lab.sh vuln     # pone la versión vulnerable
+#   bash tools/switch-lab.sh clean    # pone la versión limpia (remediada)
+#
+# Restaura solo los archivos que cambian entre versiones desde la rama base
+# correspondiente. Después hay que hacer commit y push a main para desplegar.
+set -euo pipefail
+cd "$(git rev-parse --show-toplevel)"
+
+case "${1:-}" in
+  vuln|vulnerable) REF="lab-vuln-baseline";  NAME="VULNERABLE";;
+  clean|limpia|limpio) REF="lab-clean-baseline"; NAME="LIMPIA (remediada)";;
+  *) echo "Uso: bash tools/switch-lab.sh vuln|clean"; exit 2;;
+esac
+
+# Resuelve la rama base (local o remota).
+SRC=""
+for r in "refs/heads/$REF" "refs/remotes/origin/$REF"; do
+  if git rev-parse -q --verify "$r" >/dev/null; then SRC="$r"; break; fi
+done
+if [ -z "$SRC" ]; then
+  echo "No encuentro la rama base '$REF'. Prueba:  git fetch origin $REF"
+  exit 1
+fi
+
+# Solo estos archivos difieren entre la versión vulnerable y la limpia.
+PATHS=(
+  "ciberseguridad/lab/app.html"
+  "ciberseguridad/lab/assets"
+  "ciberseguridad/lab/package.json"
+  "staticwebapp.config.json"
+)
+
+git checkout "$SRC" -- "${PATHS[@]}"
+
+echo "✔ Laboratorio cambiado a la versión $NAME (desde $SRC)."
+echo "Archivos actualizados:"
+printf '  - %s\n' "${PATHS[@]}"
+echo
+echo "Para publicar en el sitio:"
+echo "  git add -A && git commit -m 'Lab: versión $NAME' && git push origin HEAD:main"
