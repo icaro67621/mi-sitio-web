@@ -29,10 +29,10 @@
 <header class="appbar"><div class="wrap">
   <a class="logo" href="/ciberseguridad/lab/app.html"><span class="mark">V</span>Vuln<b>Bank</b></a>
   <nav class="mainnav">
-    <a href="#">Personas</a>
-    <a href="#">Empresas</a>
+    <a href="#productos">Personas</a>
+    <a href="#productos">Empresas</a>
     <a href="#herramientas">Préstamos</a>
-    <a href="#">Tarjetas</a>
+    <a href="#productos">Tarjetas</a>
     <a href="#ayuda">Ayuda</a>
   </nav>
   <span class="spacer"></span>
@@ -49,18 +49,19 @@
 <!-- Hero -->
 <section class="hero"><div class="wrap">
   <div>
-    <h1>Tu banca, simple y segura</h1>
-    <p class="lead">Administra tus cuentas, transfiere sin costo y simula tu crédito en minutos. Todo desde un solo lugar.</p>
+    <h1>Abre tu cuenta 100% digital</h1>
+    <p class="lead">Sin filas, sin papeleo y sin cuota de manejo el primer año. Tu banco donde estés, en minutos.</p>
     <div class="cta">
-      <a class="btn btn-accent" href="#login">Abrir tu cuenta</a>
-      <a class="btn btn-ghost" href="#herramientas">Simular un crédito</a>
+      <a class="btn btn-accent" href="#login">Abrir mi cuenta</a>
+      <a class="btn btn-ghost" href="#productos">Conoce las tarjetas</a>
     </div>
   </div>
   <div class="cc">
+    <span class="cc-ribbon">Nuevo</span>
     <div class="brandline">VulnBank</div>
     <div class="chip"></div>
     <div class="num">•••• •••• •••• 4821</div>
-    <div class="row"><span>TITULAR<b>A. GIL ALFONSI</b></span><span>VENCE<b>08/29</b></span></div>
+    <div class="row"><span>TARJETA ORO<b>Cashback 2%</b></span><span>SIN<b>Cuota de manejo</b></span></div>
   </div>
 </div></section>
 
@@ -72,8 +73,47 @@
   <div class="feature"><div class="ic">🏦</div><div><h4>Red nacional</h4><p>Más de 1.200 oficinas y cajeros.</p></div></div>
 </div></div>
 
+<!-- Franja publicitaria -->
+<section class="section">
+  <div class="adband">
+    <div>
+      <div class="ad-tag">Publicidad</div>
+      <h3>Trae tu nómina y llévate $50.000</h3>
+      <p>Abre tu cuenta de nómina 100% digital y recibe un bono de bienvenida.</p>
+    </div>
+    <a class="btn" href="#login">Quiero mi bono</a>
+  </div>
+</section>
+
+<!-- Productos -->
+<section class="section" id="productos">
+  <div class="section-head"><h2>Nuestros productos</h2><p>Soluciones para tu día a día y tus metas.</p></div>
+  <div class="product-grid">
+    <div class="product">
+      <div class="pic">🏦</div><h4>Cuenta de Ahorros</h4>
+      <p>Sin cuota de manejo el primer año y rendimientos diarios.</p>
+      <span class="rate">2,5% E.A.</span><a class="more" href="#login">Abrir cuenta →</a>
+    </div>
+    <div class="product">
+      <div class="pic">💳</div><h4>Tarjeta de Crédito Oro</h4>
+      <p>Cashback del 2% y acceso a salas VIP de aeropuertos.</p>
+      <span class="rate">Cashback 2%</span><a class="more" href="#productos">Solicitar →</a>
+    </div>
+    <div class="product">
+      <div class="pic">💼</div><h4>Crédito de Libre Inversión</h4>
+      <p>Hasta $50.000.000 a cuotas fijas; desembolso en 24 horas.</p>
+      <span class="rate">desde 1,2% M.V.</span><a class="more" href="#herramientas">Simular →</a>
+    </div>
+    <div class="product">
+      <div class="pic">📈</div><h4>CDT Digital</h4>
+      <p>Invierte desde $100.000 y asegura tu rentabilidad.</p>
+      <span class="rate">hasta 10,5% E.A.</span><a class="more" href="#productos">Invertir →</a>
+    </div>
+  </div>
+</section>
+
 <!-- Herramientas públicas -->
-<section class="section" id="herramientas">
+<section class="alt"><div class="section" id="herramientas">
   <div class="section-head"><h2>Herramientas</h2><p>Simula tu crédito o encuentra una oficina cercana.</p></div>
   <div class="tool-grid">
     <div class="card">
@@ -99,6 +139,25 @@
         </form>
         <div id="resultado" class="result"></div>
       </div>
+    </div>
+  </div>
+</div></section>
+
+<!-- Promos -->
+<section class="section">
+  <div class="section-head"><h2>Promociones</h2><p>Aprovecha nuestros beneficios por tiempo limitado.</p></div>
+  <div class="promo-grid">
+    <div class="promo-card p1">
+      <span class="tagline">Remesas</span>
+      <h3>Recibe dinero del exterior sin costo</h3>
+      <p>Tus remesas llegan directo a tu cuenta, sin comisiones.</p>
+      <a class="btn" href="#login">Más información</a>
+    </div>
+    <div class="promo-card p2">
+      <span class="tagline">Refiere y gana</span>
+      <h3>Gana $30.000 por cada amigo</h3>
+      <p>Invita a tus amigos a VulnBank y ambos reciben un bono.</p>
+      <a class="btn" href="#login">Invitar amigos</a>
     </div>
   </div>
 </section>
@@ -132,7 +191,7 @@
   </div>
 </div></section>
 
-<!-- Resumen de cuenta (se muestra tras iniciar sesión) -->
+<!-- Resumen de cuenta (se muestra SOLO tras iniciar sesión) -->
 <section class="section" id="panel" hidden>
   <div class="section-head"><h2>Resumen de tu cuenta</h2><p>Datos ficticios de la cuenta demo.</p></div>
   <p class="hello" id="hola">Hola</p>
@@ -173,6 +232,14 @@
   </div>
 </section>
 
+<!-- Confianza -->
+<div class="trust"><div class="wrap">
+  <div class="stat"><div class="n">+3M</div><div class="l">clientes en el país</div></div>
+  <div class="stat"><div class="n">4,8★</div><div class="l">en tiendas de apps</div></div>
+  <div class="stat"><div class="n">1.200+</div><div class="l">oficinas y cajeros</div></div>
+  <div class="stat"><div class="n">24/7</div><div class="l">atención al cliente</div></div>
+</div></div>
+
 <footer class="site-footer">
   <div class="wrap">
     <div>
@@ -180,8 +247,8 @@
       <p>Banca en línea de entrenamiento.</p>
       <p>Datos y saldos ficticios.</p>
     </div>
-    <div><h4>Productos</h4><a href="#">Cuentas</a><a href="#">Tarjetas</a><a href="#herramientas">Créditos</a></div>
-    <div><h4>Ayuda</h4><a href="#ayuda" id="ayuda">Centro de ayuda</a><a href="#">Oficinas</a><a href="#">Seguridad</a></div>
+    <div><h4>Productos</h4><a href="#productos">Cuentas</a><a href="#productos">Tarjetas</a><a href="#herramientas">Créditos</a></div>
+    <div><h4>Ayuda</h4><a href="#ayuda" id="ayuda">Centro de ayuda</a><a href="#herramientas">Oficinas</a><a href="#">Seguridad</a></div>
     <div><h4>Legal</h4><a href="#">Términos</a><a href="#">Privacidad</a><a href="/ciberseguridad/lab/">← Volver al lab</a></div>
   </div>
   <div class="foot-bottom">
