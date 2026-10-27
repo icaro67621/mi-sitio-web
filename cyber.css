@@ -363,6 +363,8 @@ body > footer { background: #04030a; padding: 48px 60px 28px; border-top: 1px so
 .link-more { display: inline-block; margin-top: 28px; color: var(--cyan); font-weight: 700; text-decoration: none; letter-spacing: .5px; }
 .link-more:hover { text-shadow: var(--glow-cyan); }
 .center { text-align: center; }
+.cta-row { margin-top: 36px; }
+.section-title.subhead { font-size: 20px; text-align: left; margin: 36px 0 18px; }
 
 /* Insignia de valoración */
 .rating-badge {
