@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Lab de Remediación · Ciberseguridad</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800&family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/ciberseguridad/ciber.css" />
+</head>
+<body>
+
+<!-- NAVEGACIÓN -->
+<nav>
+  <a class="brand" href="/ciberseguridad/">CYBER<span>SEC</span></a>
+  <div class="nav-links">
+    <a href="/ciberseguridad/#laboratorios">Laboratorios</a>
+    <a href="/ciberseguridad/#conferencias">Conferencias</a>
+    <a href="/ciberseguridad/#charlas">Charlas</a>
+    <a href="/ciberseguridad/#talleres">Talleres</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero hero-small">
+  <div class="hero-text">
+    <p class="kicker">&gt; root@secops:~$ scan ./vulnbank</p>
+    <h1>Lab de <span>Remediación</span></h1>
+    <p>Un mini-sitio <strong>vulnerable a propósito</strong> para enseñar, en clase, cómo detectar y remediar fallos de seguridad. Incluye librerías desactualizadas, secretos (ficticios) en el código y patrones que detectan las herramientas SAST/SCA.</p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="/ciberseguridad/lab/app.html">Abrir VulnBank Demo</a>
+      <a class="btn btn-ghost" href="#como">Cómo usarlo</a>
+    </div>
+  </div>
+</section>
+
+<!-- AVISO -->
+<section class="section">
+  <div class="card" style="max-width:860px;margin:0 auto;border-color:var(--red)">
+    <span class="badge red">AVISO</span>
+    <h3>Entorno de entrenamiento — vulnerable a propósito</h3>
+    <p>Esta aplicación contiene fallos de seguridad <strong>intencionales</strong> con fines educativos. Todos los "secretos" (claves de API, contraseñas, tokens) son <strong>inventados y no funcionan</strong>. No introduzcas aquí datos reales ni credenciales verdaderas.</p>
+  </div>
+</section>
+
+<!-- QUÉ CONTIENE -->
+<section class="section section-alt">
+  <h2 class="section-title">Qué vas a <span>encontrar</span></h2>
+  <p class="section-sub">Categorías de fallos sembrados en el laboratorio.</p>
+  <div class="grid">
+    <div class="card">
+      <div class="icon">📦</div>
+      <h3>Librerías de terceros vulnerables (SCA)</h3>
+      <p>Dependencias con versiones de CVE conocidas declaradas en <code>package.json</code> y una librería antigua cargada en la página.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🔑</div>
+      <h3>Secretos hardcodeados (ficticios)</h3>
+      <p>Claves de API, contraseña de base de datos y secreto de firma dentro del código fuente, para practicar con escáneres de secretos.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🐞</div>
+      <h3>Patrones SAST</h3>
+      <p>XSS por DOM, uso de <code>eval()</code>, aleatoriedad insegura, autenticación en el cliente y enlaces sin <code>rel="noopener"</code>.</p>
+    </div>
+    <div class="card">
+      <div class="icon">⚙️</div>
+      <h3>Malas configuraciones</h3>
+      <p>Cabeceras de seguridad débiles en la ruta del lab y recurso cargado sin integridad (SRI).</p>
+    </div>
+  </div>
+</section>
+
+<!-- CÓMO USARLO -->
+<section class="section" id="como">
+  <h2 class="section-title">Cómo usarlo en <span>clase</span></h2>
+  <div class="card" style="max-width:860px;margin:0 auto">
+    <ol style="padding-left:20px;line-height:2;color:var(--text)">
+      <li>Parte del estado <strong>vulnerable</strong> (el que ves ahora).</li>
+      <li>Pásale la carpeta <code>ciberseguridad/lab/</code> a Claude y pídele que detecte y remedie los fallos.</li>
+      <li>Revisa con tus estudiantes el antes/después y verifica con tu escáner (SAST/SCA/secretos).</li>
+      <li>Para volver a empezar, restaura el estado vulnerable:
+        <br><code>bash ciberseguridad/lab/reset-lab.sh</code></li>
+    </ol>
+    <p style="margin-top:14px">La guía del instructor con la lista completa de fallos y su remediación está en <code>ciberseguridad/lab/INSTRUCTOR.md</code> (no se publica como página).</p>
+  </div>
+</section>
+
+<footer>
+  <span class="brand">CYBER<span>SEC</span></span>
+  <small>© 2026 Ciberseguridad Empresarial · Lab de entrenamiento</small>
+</footer>
+
+</body>
+</html>

@@ -14,6 +14,13 @@
       "statusCode": 404
     },
     {
+      "route": "/ciberseguridad/lab/*",
+      "headers": {
+        "X-Robots-Tag": "noindex, nofollow",
+        "Content-Security-Policy": "default-src 'self' 'unsafe-inline' 'unsafe-eval' https: data:; img-src 'self' data: http: https:; frame-ancestors 'none'"
+      }
+    },
+    {
       "route": "/ciberseguridad/*",
       "headers": {
         "X-Robots-Tag": "noindex, nofollow"

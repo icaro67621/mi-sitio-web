@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>VulnBank · Demo vulnerable</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800&family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/ciberseguridad/ciber.css" />
+
+  <!-- VULN (librería de terceros desactualizada / SCA): jQuery 1.7.2 tiene
+       CVE conocidos. VULN (sin SRI): se carga sin atributo integrity. -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+
+  <script src="/ciberseguridad/lab/assets/config.js"></script>
+  <script src="/ciberseguridad/lab/assets/app.js"></script>
+</head>
+<body>
+
+<nav>
+  <a class="brand" href="/ciberseguridad/lab/">VULN<span>BANK</span></a>
+  <div class="nav-links">
+    <a href="/ciberseguridad/lab/">← Volver al lab</a>
+  </div>
+</nav>
+
+<section class="hero hero-small">
+  <div class="hero-text">
+    <p class="kicker">&gt; demo bancaria de entrenamiento</p>
+    <h1>Vuln<span>Bank</span></h1>
+    <!-- VULN (XSS por DOM desde la URL): este banner se rellena con el
+         fragmento de la URL mediante innerHTML (ver app.js). -->
+    <div id="banner" class="section-sub"></div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="grid">
+    <!-- Acceso -->
+    <div class="card" id="acceso">
+      <span class="badge">ACCESO</span>
+      <h3>Entrar</h3>
+      <form onsubmit="return VulnBank.login(this)">
+        <p><input name="usuario" placeholder="Usuario" autocomplete="off"></p>
+        <p><input name="clave" type="password" placeholder="Contraseña" autocomplete="off"></p>
+        <p><button class="btn btn-primary" type="submit">Iniciar sesión</button></p>
+        <p id="login-msg" class="section-sub"></p>
+      </form>
+    </div>
+
+    <!-- Búsqueda -->
+    <div class="card">
+      <span class="badge">BUSCAR</span>
+      <h3>Buscar movimientos</h3>
+      <!-- VULN (XSS por DOM): el resultado se pinta con innerHTML. -->
+      <form onsubmit="return VulnBank.buscar(this)">
+        <p><input name="q" placeholder="Ej: transferencia"></p>
+        <p><button class="btn btn-ghost" type="submit">Buscar</button></p>
+      </form>
+      <div id="resultado" class="section-sub"></div>
+    </div>
+
+    <!-- Calculadora -->
+    <div class="card">
+      <span class="badge">CUOTAS</span>
+      <h3>Calculadora de cuotas</h3>
+      <!-- VULN (eval): evalúa la expresión del usuario. -->
+      <form onsubmit="return VulnBank.calcular(this)">
+        <p><input name="expr" placeholder="Ej: 1000/12"></p>
+        <p><button class="btn btn-ghost" type="submit">Calcular</button></p>
+      </form>
+      <div id="calc-out" class="section-sub"></div>
+    </div>
+  </div>
+
+  <!-- Panel tras "login" -->
+  <div class="card" id="panel" hidden style="margin-top:22px">
+    <span class="badge">PANEL</span>
+    <h3 id="hola">Panel privado</h3>
+    <p>Saldo de la cuenta demo: <strong>$ 12.480.000 COP</strong> (dato ficticio).</p>
+    <!-- VULN (target="_blank" sin rel="noopener"): reverse tabnabbing. -->
+    <p><a href="https://owasp.org/www-community/attacks/Reverse_Tabnabbing" target="_blank">Ver documentación de soporte</a></p>
+  </div>
+</section>
+
+<footer>
+  <span class="brand">VULN<span>BANK</span></span>
+  <small>Demo vulnerable a propósito · datos y secretos ficticios</small>
+</footer>
+
+</body>
+</html>

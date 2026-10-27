@@ -1,0 +1,17 @@
+{
+  "name": "vulnbank-lab",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Laboratorio vulnerable a proposito para ensenar remediacion. Las dependencias de abajo estan fijadas a versiones con CVE conocidos para que las detecten los escaneres de composicion (SCA): npm audit, Dependabot, Snyk, Trivy. NO se instalan para un sitio real.",
+  "scripts": {
+    "audit": "npm audit"
+  },
+  "dependencies": {
+    "jquery": "1.7.2",
+    "lodash": "4.17.4",
+    "bootstrap": "3.3.7",
+    "marked": "0.3.6",
+    "minimist": "1.2.0",
+    "handlebars": "4.0.5"
+  }
+}
