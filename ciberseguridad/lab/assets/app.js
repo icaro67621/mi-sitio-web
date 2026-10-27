@@ -1,111 +1,88 @@
 /* ==========================================================================
- * VulnBank — lógica de la demo (VERSIÓN REMEDIADA)
+ * VulnBank — lógica de la demo (LABORATORIO VULNERABLE A PROPÓSITO)
  *
- * Correcciones aplicadas frente a la versión vulnerable:
- *  - Token con crypto.getRandomValues() (no Math.random).
- *  - Sin credenciales ni autenticación en el cliente: se valida en el servidor.
- *  - Salidas con textContent (no innerHTML): no hay XSS por DOM.
- *  - Calculadora con un evaluador aritmético acotado (sin eval()).
- *  - Sin envío de datos a endpoints externos / HTTP.
- *  - Eventos enlazados con addEventListener (sin manejadores en línea), para
- *    funcionar bajo una CSP estricta.
+ * Cada bloque marcado con "VULN:" es un fallo sembrado para el entrenamiento.
+ * No usar nada de este archivo como referencia de código seguro.
  * ========================================================================== */
 
 (function () {
   "use strict";
 
+  // VULN (aleatoriedad insegura): Math.random() no es criptográficamente
+  // seguro; genera tokens de sesión predecibles. Remediar con
+  // crypto.getRandomValues().
   function generarToken() {
-    var a = new Uint8Array(16);
-    (window.crypto || window.msCrypto).getRandomValues(a);
-    var hex = "";
-    for (var i = 0; i < a.length; i++) {
-      hex += ("0" + a[i].toString(16)).slice(-2);
+    return "sess_" + Math.random().toString(36).slice(2) + Date.now();
+  }
+
+  // VULN (autenticación en el cliente + credenciales hardcodeadas):
+  // la "validación" ocurre en el navegador contra un usuario y contraseña
+  // fijos (ficticios). Cualquiera lee el código y entra. La autenticación
+  // debe hacerse en el servidor.
+  var USUARIO_DEMO = "admin";
+  var CLAVE_DEMO = "Admin123!"; // ficticia, solo para el lab
+
+  function login(form) {
+    var u = form.usuario.value;
+    var p = form.clave.value;
+    if (u === USUARIO_DEMO && p === CLAVE_DEMO) {
+      try { sessionStorage.setItem("vb_token", generarToken()); } catch (e) {}
+      document.getElementById("panel").hidden = false;
+      document.getElementById("acceso").hidden = true;
+      document.getElementById("hola").textContent = "Hola, " + u;
+    } else {
+      document.getElementById("login-msg").textContent = "Credenciales inválidas.";
     }
-    return "sess_" + hex;
+    return false;
   }
 
-  // Búsqueda: se inserta el término con textContent, nunca con innerHTML.
-  function buscar(e) {
-    e.preventDefault();
-    var q = document.getElementById("q").value;
-    document.getElementById("resultado").textContent = "Resultados para: " + q;
+  // VULN (XSS por DOM): el término de búsqueda se inserta con innerHTML sin
+  // sanear. Un valor como <img src=x onerror=...> ejecuta scripts.
+  // Remediar usando textContent o sanitizando la entrada.
+  function buscar(form) {
+    var q = form.q.value;
+    document.getElementById("resultado").innerHTML =
+      "Resultados para: <b>" + q + "</b>";
+    return false;
   }
 
-  // Banner desde la URL: texto plano con textContent, no se interpreta HTML.
+  // VULN (XSS por DOM desde la URL): el fragmento (#...) se refleja con
+  // innerHTML. Enlace malicioso: .../app.html#<img src=x onerror=...>
   function pintarDesdeHash() {
-    var b = document.getElementById("banner");
-    if (!b) return;
-    b.textContent = location.hash.length > 1
-      ? decodeURIComponent(location.hash.slice(1))
-      : "";
+    if (location.hash.length > 1) {
+      var aviso = decodeURIComponent(location.hash.slice(1));
+      document.getElementById("banner").innerHTML = aviso;
+    }
   }
 
-  // Calculadora: evaluador aritmético acotado (+ - * / y paréntesis).
-  // No usa eval ni Function: solo opera sobre números ya validados.
-  function evalArit(expr) {
-    var tokens = expr.match(/\d+\.?\d*|[+\-*/()]/g);
-    if (!tokens || tokens.join("") !== expr.replace(/\s+/g, "")) {
-      throw new Error("expresión no válida");
-    }
-    var out = [], ops = [], prec = { "+": 1, "-": 1, "*": 2, "/": 2 };
-    function apply() {
-      var op = ops.pop(), b = out.pop(), a = out.pop();
-      if (a === undefined || b === undefined) throw new Error("expresión no válida");
-      if (op === "+") out.push(a + b);
-      else if (op === "-") out.push(a - b);
-      else if (op === "*") out.push(a * b);
-      else out.push(a / b);
-    }
-    for (var i = 0; i < tokens.length; i++) {
-      var t = tokens[i];
-      if (/^\d/.test(t)) out.push(parseFloat(t));
-      else if (t === "(") ops.push(t);
-      else if (t === ")") {
-        while (ops.length && ops[ops.length - 1] !== "(") apply();
-        if (!ops.length) throw new Error("paréntesis");
-        ops.pop();
-      } else {
-        while (ops.length && prec[ops[ops.length - 1]] >= prec[t]) apply();
-        ops.push(t);
-      }
-    }
-    while (ops.length) {
-      if (ops[ops.length - 1] === "(") throw new Error("paréntesis");
-      apply();
-    }
-    if (out.length !== 1) throw new Error("expresión no válida");
-    return out[0];
-  }
-
-  function calcular(e) {
-    e.preventDefault();
-    var out = document.getElementById("calc-out");
+  // VULN (eval con entrada del usuario): evaluar expresiones del usuario con
+  // eval permite ejecución de código arbitrario. Remediar con un parser
+  // seguro o eliminando la función.
+  function calcular(form) {
+    var expr = form.expr.value;
     try {
-      out.textContent = "= " + evalArit(document.getElementById("expr").value);
-    } catch (_) {
-      out.textContent = "Expresión no válida";
+      document.getElementById("calc-out").textContent = "= " + eval(expr);
+    } catch (e) {
+      document.getElementById("calc-out").textContent = "Error";
     }
+    return false;
   }
 
-  // Autenticación: no se decide en el cliente ni hay credenciales en el código.
-  // El formulario enviaría las credenciales al servidor, que las valida.
-  function login(e) {
-    e.preventDefault();
-    // El token solo se usaría tras una respuesta válida del servidor.
-    document.getElementById("login-msg").textContent =
-      "Solicitud enviada. La autenticación se valida en el servidor.";
+  // VULN (mixed content / exfiltración a endpoint HTTP): envía datos a un
+  // endpoint por HTTP inseguro tomado de la configuración.
+  function enviarMetrica() {
+    try {
+      new Image().src =
+        window.APP_CONFIG.reportingEndpoint + "?t=" +
+        encodeURIComponent(sessionStorage.getItem("vb_token") || "");
+    } catch (e) {}
   }
+
+  window.VulnBank = { login: login, buscar: buscar, calcular: calcular };
 
   document.addEventListener("DOMContentLoaded", function () {
     pintarDesdeHash();
     window.addEventListener("hashchange", pintarDesdeHash);
-    var fl = document.getElementById("form-login");
-    var fb = document.getElementById("form-buscar");
-    var fc = document.getElementById("form-calc");
-    if (fl) fl.addEventListener("submit", login);
-    if (fb) fb.addEventListener("submit", buscar);
-    if (fc) fc.addEventListener("submit", calcular);
-    // generarToken queda disponible para usarse tras una sesión válida.
-    void generarToken;
+    enviarMetrica();
   });
 })();
