@@ -20,7 +20,7 @@
   // fijos (ficticios). Cualquiera lee el código y entra. La autenticación
   // debe hacerse en el servidor.
   var USUARIO_DEMO = "admin";
-  var CLAVE_DEMO = "Admin123!"; // ficticia, solo para el lab
+  var CLAVE_DEMO = "V8lnB@nk#Str0ng_2026"; // ficticia, solo para el lab
 
   function login(form) {
     var u = form.usuario.value;
