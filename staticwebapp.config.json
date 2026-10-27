@@ -22,6 +22,10 @@
       "statusCode": 404
     },
     {
+      "route": "/ciberseguridad/lab/check-lab.sh",
+      "statusCode": 404
+    },
+    {
       "route": "/ciberseguridad/lab/package.json",
       "statusCode": 404
     },
