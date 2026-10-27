@@ -30,7 +30,7 @@ chk "4. eval() con entrada del usuario (app.js)" "$LAB/assets/app.js"  'eval\('
 # 5. Token con Math.random
 chk "5. Token con Math.random (app.js)"          "$LAB/assets/app.js"  'Math\.random'
 # 6. Credenciales fijas / auth en cliente
-chk "6. Credenciales fijas (app.js)"             "$LAB/assets/app.js"  'Admin123!'
+chk "6. Credenciales fijas (app.js)"             "$LAB/assets/app.js"  'V8lnB@nk#Str0ng_2026'
 # 7. jQuery 1.7.2 vulnerable
 chk "7. jQuery 1.7.2 (app.html)"                 "$LAB/app.html"       'jquery/1\.7\.2'
 # 8. Script externo sin SRI (jQuery sin integrity)
