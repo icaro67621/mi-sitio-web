@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PsicoAnatips - Psicología · Bienestar1 · Conexión</title>
+  <title>PsicoAnatips · Psic. Ana Luisa Gil Alfonsi - Psicología en Bogotá y online</title>
+  <meta name="description" content="Psicóloga clínica con 15 años de experiencia en Terapia Cognitivo-Conductual. Ansiedad, autoestima, estrés y propósito de vida. Consulta presencial en Bogotá y online." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet" />
@@ -16,17 +17,17 @@
 
 <!-- NAVEGACIÓN -->
 <nav>
-  <div class="logo">psico<span>anatips</span></div>
+  <div class="logo"><a href="index.html">psico<span>anatips</span></a></div>
   <div class="nav-links">
-    <a href="#inicio" class="active">Inicio</a>
+    <a href="index.html" class="active">Inicio</a>
     <a href="sobre-mi.html">Sobre mí</a>
-    <a href="#servicios">Servicios</a>
-    <a href="#recursos">Recursos</a>
-    <a href="#podcast">Podcast</a>
-    <a href="#talleres">Talleres</a>
-    <a href="#contacto">Contacto</a>
+    <a href="index.html#servicios">Servicios</a>
+    <a href="articulos.html">Artículos</a>
+    <a href="videos.html">Videos</a>
+    <a href="index.html#opiniones">Opiniones</a>
+    <a href="index.html#contacto">Contacto</a>
   </div>
- <a href="https://anagilpsicologia.com/#appointment" target="_blank" class="btn-cta-lg">Agenda tu cita</a>
+  <a href="https://anagilpsicologia.com/#appointment" target="_blank" rel="noopener" class="btn-cta-lg">Agenda tu cita</a>
 </nav>
 
 <!-- HERO -->
@@ -34,8 +35,11 @@
   <div class="hero-text">
     <h1>Reconecta<br><span>contigo.</span> ♡</h1>
     <p class="tagline">Vive con propósito y equilibrio</p>
-    <p>Acompañamiento psicológico para mujeres que buscan bienestar emocional, autoestima y una vida más consciente.</p>
-    <button class="btn-outline">Conoce mis servicios →</button>
+    <p>Soy Ana Luisa Gil Alfonsi, psicóloga clínica con 15 años de experiencia. Te acompaño a gestionar la ansiedad, fortalecer tu autoestima y construir un bienestar duradero, en consulta presencial en Bogotá u online.</p>
+    <a class="rating-badge" href="https://www.topdoctors.com.co/doctor/ana-luisa-gil-alfonsi/#reviews" target="_blank" rel="noopener"><b>★★★★★</b> 5.0 · 27 opiniones verificadas en Top Doctors</a>
+    <div class="hero-actions">
+      <a class="btn-outline" href="#servicios">Conoce mis servicios →</a>
+    </div>
   </div>
   <div class="hero-img">
     <div class="cube">
@@ -51,97 +55,198 @@
 
 <!-- CARACTERÍSTICAS -->
 <div class="features">
-  <div class="feat"><div class="feat-icon">💻</div><p>Psicoterapia online y presencial</p></div>
-  <div class="feat"><div class="feat-icon">🔬</div><p>Enfoque científico y humano</p></div>
-  <div class="feat"><div class="feat-icon">❤️</div><p>Terapias basadas en evidencia</p></div>
-  <div class="feat"><div class="feat-icon">🔒</div><p>Espacio seguro y confidencial</p></div>
+  <div class="feat"><div class="feat-icon">💻</div><p>Consulta presencial en Bogotá y online (telemedicina)</p></div>
+  <div class="feat"><div class="feat-icon">🧠</div><p>Enfoque Cognitivo-Conductual, con Coaching y PNL</p></div>
+  <div class="feat"><div class="feat-icon">⏳</div><p>15 años de experiencia en atención psicológica</p></div>
+  <div class="feat"><div class="feat-icon">🌎</div><p>Atención en español e inglés</p></div>
 </div>
 
 <!-- SERVICIOS -->
 <section class="section section-bg" id="servicios">
   <h2 class="section-title">¿Cómo puedo <span>acompañarte?</span></h2>
   <div class="services-grid">
-    <div class="service-card">
-      <div class="s-icon">🧠</div>
-      <h3>Psicoterapia individual</h3>
-      <p>Acompañamiento personalizado para gestionar emociones, creencias y desafíos de la vida.</p>
-      <a href="#">Ver más →</a>
-    </div>
-    <div class="service-card">
-      <div class="s-icon">🌿</div>
-      <h3>Bienestar emocional</h3>
-      <p>Programas y herramientas para fortalecer tu autonomía, manejo del estrés y bienestar integral.</p>
-      <a href="#">Ver más →</a>
-    </div>
-    <div class="service-card">
-      <div class="s-icon">🎙️</div>
-      <h3>Caos y Café (Podcast)</h3>
-      <p>Conversaciones honestas sobre salud mental, consciencia y crecimiento personal.</p>
-      <a href="#" id="podcast">Escuchar →</a>
-    </div>
-    <div class="service-card">
-      <div class="s-icon">🌸</div>
-      <h3>Talleres y programas</h3>
-      <p>Espacios grupales y programas para reconectar contigo y vivir con intención.</p>
-      <a href="#" id="talleres">Ver más →</a>
-    </div>
+    <a class="service-card" href="articulos/trastorno-de-ansiedad.html">
+      <div class="s-icon">🌀</div>
+      <h3>Ansiedad, depresión y pánico</h3>
+      <p>Herramientas para entender lo que sientes, regular la alerta constante y recuperar la calma en tu día a día.</p>
+      <span class="card-link">Leer más →</span>
+    </a>
+    <a class="service-card" href="articulos/autoestima-como-influye-bienestar-relaciones.html">
+      <div class="s-icon">🪞</div>
+      <h3>Autoestima y autoimagen</h3>
+      <p>Fortalece la forma en que te ves, te tratas y te valoras para tomar decisiones y relacionarte desde la seguridad.</p>
+      <span class="card-link">Leer más →</span>
+    </a>
+    <a class="service-card" href="articulos/estres-laboral-cuando-deja-ser-parte-trabajo-comienza-afectar-nuestra-salud-mental.html">
+      <div class="s-icon">💼</div>
+      <h3>Estrés y estrés laboral</h3>
+      <p>Identifica las señales de agotamiento, aprende a poner límites y recupera el equilibrio entre trabajo y vida.</p>
+      <span class="card-link">Leer más →</span>
+    </a>
+    <a class="service-card" href="articulos/descubrir-proposito-construir-proyecto-vida-con-sentido.html">
+      <div class="s-icon">🧭</div>
+      <h3>Propósito de vida y desarrollo personal</h3>
+      <p>Coaching y PNL para descubrir qué te mueve y construir un proyecto de vida con sentido.</p>
+      <span class="card-link">Leer más →</span>
+    </a>
+    <a class="service-card" href="articulos/la-trampa-de-la-mujer-perfecta-y-la-trampa-de-la-autoexigencia.html">
+      <div class="s-icon">👩</div>
+      <h3>Mujer, maternidad y autoexigencia</h3>
+      <p>Libérate de la trampa de la perfección y reconecta con tu identidad y tus proyectos sin culpa.</p>
+      <span class="card-link">Leer más →</span>
+    </a>
+    <a class="service-card" href="#contacto">
+      <div class="s-icon">💔</div>
+      <h3>Ruptura amorosa y dependencia emocional</h3>
+      <p>Acompañamiento para atravesar el duelo, sanar y construir relaciones más sanas contigo y con los demás.</p>
+      <span class="card-link">Agenda tu cita →</span>
+    </a>
+    <a class="service-card" href="#contacto">
+      <div class="s-icon">🥗</div>
+      <h3>Psiconutrición</h3>
+      <p>Conecta tu salud emocional con tus hábitos alimenticios y construye una relación sana con la comida y tu cuerpo.</p>
+      <span class="card-link">Agenda tu cita →</span>
+    </a>
+    <a class="service-card" href="#contacto">
+      <div class="s-icon">🎤</div>
+      <h3>Habilidades sociales y hablar en público</h3>
+      <p>Gana seguridad para comunicarte, expresarte y desenvolverte en situaciones sociales y profesionales.</p>
+      <span class="card-link">Agenda tu cita →</span>
+    </a>
   </div>
 </section>
 
 <!-- SOBRE MÍ -->
 <section class="about" id="sobre-mi">
-  <div class="about-img-wrap">👩‍⚕️</div>
+  <div class="about-img-wrap has-photo"><img src="ana-luisa-gil-alfonsi-1775595311.jpeg" alt="Psic. Ana Luisa Gil Alfonsi" /></div>
   <div class="about-text">
     <h2>Hola, soy Ana ♡</h2>
-    <p class="about-subtitle">Psicóloga clínica, investigadora y apasionada por el bienestar emocional.</p>
-    <p>Llevo más de 12 años ayudando a mujeres en su proceso de transformación personal. Mi enfoque integra la ciencia psicológica con empatía, la autenticidad y el compromiso para reconectar contigo y vivir tu vida más plena.</p>
-    <button class="btn-outline small">Conóceme más →</button>
+    <p class="about-subtitle">Psicóloga clínica · Especialista en Terapia Cognitivo-Conductual</p>
+    <p>Soy una profesional con alta vocación de servicio e interés real por cada uno de mis casos. Utilizo un enfoque integral que permite abordar tanto los desafíos emocionales como los hábitos de vida, para que construyas un bienestar duradero, identifiques heridas del pasado y aprendas a manejar tus conflictos emocionales.</p>
+    <a class="btn-outline small" href="sobre-mi.html">Conóceme más →</a>
   </div>
   <div class="tags">
-    <span class="tag">Terapia Cognitivo Conductual</span>
-    <span class="tag">Terapia de tercera generación (ACT, Mindfulness)</span>
-    <span class="tag">Psiconutrición y desarrollo personal</span>
+    <span class="tag">Terapia Cognitivo-Conductual</span>
+    <span class="tag">Coaching y Programación Neurolingüística</span>
+    <span class="tag">Psiconutrición y hábitos saludables</span>
     <span class="tag">Autoestima y desarrollo personal</span>
   </div>
 </section>
 
-<!-- TESTIMONIO -->
-<div class="testimonial">
-  <blockquote class="quote">
-    "Ana me ayudó a encontrarme, sanar y crecer y verme con más cariño. Su acompañamiento fue transformador, cálido y profesional, cálido y transformador."
-    <footer>— Paciente</footer>
-  </blockquote>
-</div>
-
-<!-- RECURSOS -->
+<!-- ARTÍCULOS -->
 <section class="resources" id="recursos">
-  <h2>Recursos gratuitos para ti</h2>
+  <h2>Artículos recientes</h2>
   <div class="resource-cards">
-    <div class="resource-card">
-      <h4>🎙️ Podcast: Caos y Café</h4>
-      <p>Episodios semanales sobre salud mental, autoestima y crecimiento personal con perspectiva científica.</p>
-    </div>
-    <div class="resource-card">
-      <h4>📘 Guías y talleres</h4>
-      <p>Materiales descargables y reflexiones para acompañar tu proceso de transformación personal.</p>
-    </div>
-    <div class="resource-card">
-      <h4>📱 Comunidad online</h4>
-      <p>Únete y recibe herramientas, tips y recursos cada semana directamente en tu correo.</p>
-    </div>
+    <a class="resource-card" href="articulos/proposito-de-vida-en-la-mediana-edad.html">
+      <span class="card-meta">🧭 25 de septiembre de 2026</span>
+      <h4>Propósito de vida en la mediana edad: ¿Y si ya no quieres la vida que antes soñabas?</h4>
+      <p>El propósito de vida en la mediana edad puede cambiar. Descubre por qué lo que antes soñabas puede dejar de tener el mismo sentido y cómo replantearlo.</p>
+      <span class="card-link">Leer artículo →</span>
+    </a>
+    <a class="resource-card" href="articulos/descubrir-proposito-construir-proyecto-vida-con-sentido.html">
+      <span class="card-meta">✨ 15 de junio de 2026</span>
+      <h4>Descubrir el propósito y construir un proyecto de vida con sentido</h4>
+      <p>¿Por qué tantas personas sienten que “funcionan” en la vida, pero no se sienten realmente realizadas?</p>
+      <span class="card-link">Leer artículo →</span>
+    </a>
+    <a class="resource-card" href="articulos/estres-laboral-cuando-deja-ser-parte-trabajo-comienza-afectar-nuestra-salud-mental.html">
+      <span class="card-meta">💼 15 de junio de 2026</span>
+      <h4>Estrés Laboral: Cuándo deja de ser parte del trabajo y comienza a afectar nuestra salud mental</h4>
+      <p>El estrés laboral comienza a afectar seriamente la salud mental cuando la persona ya no logra recuperarse</p>
+      <span class="card-link">Leer artículo →</span>
+    </a>
   </div>
+  <a class="link-more" href="articulos.html">Ver todos los artículos →</a>
 </section>
 
-<!-- NEWSLETTER -->
-<section class="newsletter" id="contacto">
-  <div>
-    <h3>¡Bienvenida a Reconectarte!</h3>
-    <p>Suscríbete y accede a recursos exclusivos, herramientas, reflexiones y mucho más.</p>
+<!-- VIDEOS -->
+<section class="section section-bg" id="videos">
+  <h2 class="section-title">Videos y <span>entrevistas</span></h2>
+  <div class="video-grid">
+    <div class="resource-card video-card">
+      <div class="yt" data-id="wJufjxj7EOI" role="button" tabindex="0" aria-label="Reproducir: Maternidad e identidad: cómo recuperar tus proyectos sin culpa"></div>
+      <div class="video-body">
+        <span class="card-meta">Salud de Primera · Top Doctors</span>
+        <h4>Maternidad e identidad: cómo recuperar tus proyectos sin culpa</h4>
+        <p>Por qué algunas mujeres sienten que han perdido parte de su identidad después de convertirse en madres, y cómo reconectar con sus sueños y proyectos sin culpa.</p>
+      </div>
+    </div>
+    <div class="resource-card video-card">
+      <div class="yt" data-id="VzJwEcDy0kg" role="button" tabindex="0" aria-label="Reproducir: Therians: identidad, mente y fenómeno social"></div>
+      <div class="video-body">
+        <span class="card-meta">Salud de Primera · Top Doctors</span>
+        <h4>Therians: identidad, mente y fenómeno social</h4>
+        <p>Las razones y motivaciones detrás de uno de los movimientos sociales actuales: los &quot;therians&quot;.</p>
+      </div>
+    </div>
+    <div class="resource-card video-card">
+      <div class="yt" data-id="MRgIhXhs6bs" role="button" tabindex="0" aria-label="Reproducir: Depresión y Ansiedad: comprendiendo y entendiendo esta enfermedad"></div>
+      <div class="video-body">
+        <span class="card-meta">Salud de Primera · Top Doctors</span>
+        <h4>Depresión y Ansiedad: comprendiendo y entendiendo esta enfermedad</h4>
+        <p>Qué es la depresión, sus factores y cómo afrontarla, resolviendo las dudas más frecuentes.</p>
+      </div>
+    </div>
   </div>
-  <div class="nl-form">
-    <input type="email" placeholder="Escribe tu correo aquí" />
-    <button>Suscribirme</button>
+  <div class="center"><a class="link-more" href="videos.html">Ver todos los videos →</a></div>
+</section>
+
+<!-- OPINIONES -->
+<section class="section" id="opiniones">
+  <h2 class="section-title">Lo que dicen mis <span>pacientes</span></h2>
+  <div class="reviews">
+    <blockquote class="review">
+      <div class="stars">★★★★★</div>
+      <p>“Para mí hay un antes y un después de venir a terapia, me ayudó a comprenderme mejor, a identificar mis emociones y manejarlas de forma más amable conmigo misma, ahora me encuentro más tranquila”</p>
+      <footer>— G.C. · Paciente verificado · 13 de abril de 2026</footer>
+    </blockquote>
+    <blockquote class="review">
+      <div class="stars">★★★★★</div>
+      <p>“Llegué con mucha ansiedad, sintiendo que todo me sobrepasaba. Desde el inicio, la terapeuta supo guiar el proceso con cercanía y claridad, ayudándome a entender lo que me pasaba y por qué me sentía así. Gracias a su acompañamiento, hoy tengo más herramientas, me conozco mejor y manejo la ansiedad con mayor tranquilidad.”</p>
+      <footer>— G.C. · Paciente verificado · 13 de abril de 2026</footer>
+    </blockquote>
+    <blockquote class="review">
+      <div class="stars">★★★★★</div>
+      <p>“Llegué a consulta en uno de los momentos más difíciles de mi vida, sintiéndome perdido y sin esperanza. Poco a poco, gracias a su acompañamiento, empecé a entender lo que me pasaba y a encontrar herramientas para salir adelante. Me sentí escuchado, comprendido y nunca juzgado. Hoy me siento más fuerte y con ganas de vivir.”</p>
+      <footer>— G.C. · Paciente verificado · 13 de abril de 2026</footer>
+    </blockquote>
+    <blockquote class="review">
+      <div class="stars">★★★★★</div>
+      <p>“Con la ayuda de esta psicóloga pude vencer fobias al miedo a la altura y me he sentido libre de esos temores”</p>
+      <footer>— M.A. · Paciente verificado · 2 de noviembre de 2025</footer>
+    </blockquote>
+    <blockquote class="review">
+      <div class="stars">★★★★★</div>
+      <p>“Maravilloso trato, muy empática comprensiva me ayudó con mi problema de salud y he visto mejoría en mi día a día”</p>
+      <footer>— M.A. · Paciente verificado · 2 de noviembre de 2025</footer>
+    </blockquote>
+    <blockquote class="review">
+      <div class="stars">★★★★★</div>
+      <p>“Muy buena atención, muy buen trato me ayudó a superar obstáculos de hechos que han pasado en mi vida súper recomendado”</p>
+      <footer>— M.M. · Paciente verificado · 2 de noviembre de 2025</footer>
+    </blockquote>
   </div>
+  <div class="center"><a class="link-more" href="https://www.topdoctors.com.co/doctor/ana-luisa-gil-alfonsi/#reviews" target="_blank" rel="noopener">Ver las 27 opiniones en Top Doctors →</a></div>
+</section>
+
+<!-- CONTACTO -->
+<section class="section section-bg" id="contacto">
+  <h2 class="section-title">Da el <span>primer paso</span></h2>
+  <div class="contact">
+    <div class="resource-card">
+      <h4>📍 Consulta presencial</h4>
+      <p>Consultorio privado<br><a href="https://www.google.com/maps/search/?api=1&query=Cra.+45+%23123-60,+Bogot%C3%A1,+Colombia" target="_blank" rel="noopener">Cra. 45 #123-60, Bogotá, Colombia</a></p>
+    </div>
+    <div class="resource-card">
+      <h4>💻 Consulta online</h4>
+      <p>Sesiones por videollamada para Colombia y el mundo, en español o inglés.</p>
+    </div>
+    <div class="resource-card">
+      <h4>📱 Sígueme</h4>
+      <p><a href="https://www.instagram.com/psicoanatips/" target="_blank" rel="noopener">Instagram @psicoanatips</a><br><a href="https://www.topdoctors.com.co/doctor/ana-luisa-gil-alfonsi/" target="_blank" rel="noopener">Perfil en Top Doctors</a></p>
+    </div>
+  </div>
+  <div class="center" style="margin-top:36px;"><a href="https://anagilpsicologia.com/#appointment" target="_blank" rel="noopener" class="btn-cta-lg">Agenda tu cita</a></div>
 </section>
 
 <!-- FOOTER -->
@@ -149,37 +254,36 @@
   <div class="footer-grid">
     <div class="footer-col">
       <div class="footer-logo-text">psicoanatips</div>
-      <p>Psicología · Bienestar · Conexión</p>
-      <p style="margin-top:10px;">Medellín, Colombia</p>
-      <p>info@psicoanatips.com</p>
-      <p>+57 316 533-4567</p>
+      <p>Psic. Ana Luisa Gil Alfonsi</p>
+      <p>Psicología clínica · Enfoque Cognitivo-Conductual</p>
+      <p style="margin-top:10px;">Consultorio privado · Bogotá, Colombia</p>
     </div>
     <div class="footer-col">
-      <h4>Enlace rápido</h4>
-      <a href="#sobre-mi">Sobre mí</a>
-      <a href="#servicios">Servicios</a>
-      <a href="#talleres">Talleres y programas</a>
-      <a href="#podcast">Podcast</a>
-      <a href="#contacto">Contacto</a>
+      <h4>Navegación</h4>
+      <a href="sobre-mi.html">Sobre mí</a>
+      <a href="index.html#servicios">Servicios</a>
+      <a href="articulos.html">Artículos</a>
+      <a href="videos.html">Videos</a>
+      <a href="index.html#opiniones">Opiniones</a>
     </div>
     <div class="footer-col">
-      <h4>Temas</h4>
-      <a href="#">Autoestima</a>
-      <a href="#">Maternidad consciente</a>
-      <a href="#">Salud mental</a>
-      <a href="#">Relaciones personales</a>
-      <a href="#">Crecimiento personal</a>
+      <h4>Artículos</h4>
+      <a href="articulos/proposito-de-vida-en-la-mediana-edad.html">Propósito de vida en la mediana edad</a>
+      <a href="articulos/descubrir-proposito-construir-proyecto-vida-con-sentido.html">Descubrir el propósito y construir un proyecto de vida con sentido</a>
+      <a href="articulos/estres-laboral-cuando-deja-ser-parte-trabajo-comienza-afectar-nuestra-salud-mental.html">Estrés Laboral</a>
+      <a href="articulos/trastorno-de-ansiedad.html">Trastorno de Ansiedad</a>
     </div>
     <div class="footer-col">
       <h4>Contacto</h4>
-      <p>info@psicoanatips.com</p>
-      <p>+57 316 533-4567</p>
-      <p>Medellín, Colombia</p>
+      <a href="https://www.google.com/maps/search/?api=1&query=Cra.+45+%23123-60,+Bogot%C3%A1,+Colombia" target="_blank" rel="noopener">Cra. 45 #123-60, Bogotá</a>
+      <p>Consulta presencial y online</p>
+      <a href="https://www.instagram.com/psicoanatips/" target="_blank" rel="noopener">Instagram @psicoanatips</a>
+      <a href="https://www.topdoctors.com.co/doctor/ana-luisa-gil-alfonsi/" target="_blank" rel="noopener">Perfil en Top Doctors</a>
     </div>
   </div>
   <div class="footer-bottom">
     <span class="footer-brand">psicoanatips</span>
-    <span class="footer-copy">© 2025 PsicoAnatips. Todos los derechos reservados.</span>
+    <span class="footer-copy">© 2026 PsicoAnatips · Psic. Ana Luisa Gil Alfonsi. Todos los derechos reservados.</span>
   </div>
 </footer>
 
