@@ -4,86 +4,184 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex, nofollow" />
-  <title>VulnBank · Demo (versión remediada)</title>
+  <title>VulnBank · Banca en línea (versión remediada)</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800&family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/ciberseguridad/ciber.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/ciberseguridad/lab/lab.css" />
 
-  <!-- Remediado: sin jQuery vulnerable. Los scripts propios se cargan desde
-       el propio origen y funcionan bajo una CSP estricta. -->
+  <!-- Remediado: sin jQuery vulnerable. Scripts propios desde el mismo origen. -->
   <script src="/ciberseguridad/lab/assets/config.js"></script>
   <script src="/ciberseguridad/lab/assets/app.js"></script>
 </head>
 <body>
 
-<nav>
-  <a class="brand" href="/ciberseguridad/lab/">VULN<span>BANK</span></a>
-  <div class="nav-links">
-    <a href="/ciberseguridad/lab/">← Volver al lab</a>
-  </div>
-</nav>
+<!-- Barra de servicio -->
+<div class="topbar"><div class="wrap">
+  <span>📞 01 8000 000 000 · Atención 24/7</span>
+  <span class="secure">🔒 Conexión segura · versión remediada</span>
+</div></div>
 
-<section class="hero hero-small">
-  <div class="hero-text">
-    <p class="kicker">&gt; demo bancaria de entrenamiento · versión remediada</p>
-    <h1>Vuln<span>Bank</span></h1>
-    <!-- Remediado: el banner se rellena con textContent (ver app.js). -->
-    <div id="banner" class="section-sub"></div>
+<!-- Navegación -->
+<header class="appbar"><div class="wrap">
+  <a class="logo" href="/ciberseguridad/lab/app.html"><span class="mark">V</span>Vuln<b>Bank</b></a>
+  <nav class="mainnav">
+    <a href="#">Personas</a>
+    <a href="#">Empresas</a>
+    <a href="#herramientas">Préstamos</a>
+    <a href="#">Tarjetas</a>
+    <a href="#ayuda">Ayuda</a>
+  </nav>
+  <span class="spacer"></span>
+  <div class="right">
+    <a class="lab-back" href="/ciberseguridad/lab/">← Lab</a>
+    <a class="btn btn-primary btn-sm" href="#login">Ingresar</a>
+  </div>
+</div></header>
+
+<!-- Banner (se rellena desde la URL) -->
+<div class="promo"><div class="wrap"><span id="banner"></span></div></div>
+
+<!-- Hero -->
+<section class="hero"><div class="wrap">
+  <div>
+    <h1>Tu banca, simple y segura</h1>
+    <p class="lead">Administra tus cuentas, transfiere sin costo y simula tu crédito en minutos. Todo desde un solo lugar.</p>
+    <div class="cta">
+      <a class="btn btn-accent" href="#login">Abrir tu cuenta</a>
+      <a class="btn btn-ghost" href="#herramientas">Simular un crédito</a>
+    </div>
+  </div>
+  <div class="cc">
+    <div class="brandline">VulnBank</div>
+    <div class="chip"></div>
+    <div class="num">•••• •••• •••• 4821</div>
+    <div class="row"><span>TITULAR<b>A. GIL ALFONSI</b></span><span>VENCE<b>08/29</b></span></div>
+  </div>
+</div></section>
+
+<!-- Ventajas -->
+<div class="features"><div class="wrap">
+  <div class="feature"><div class="ic">💸</div><div><h4>Transferencias sin costo</h4><p>Envía dinero a cualquier banco al instante.</p></div></div>
+  <div class="feature"><div class="ic">🛡️</div><div><h4>Protección avanzada</h4><p>Monitoreo y alertas de seguridad 24/7.</p></div></div>
+  <div class="feature"><div class="ic">📱</div><div><h4>App móvil</h4><p>Tu banco en el bolsillo, siempre disponible.</p></div></div>
+  <div class="feature"><div class="ic">🏦</div><div><h4>Red nacional</h4><p>Más de 1.200 oficinas y cajeros.</p></div></div>
+</div></div>
+
+<!-- Herramientas públicas -->
+<section class="section" id="herramientas">
+  <div class="section-head"><h2>Herramientas</h2><p>Simula tu crédito o encuentra una oficina cercana.</p></div>
+  <div class="tool-grid">
+    <div class="card">
+      <div class="card-h"><h3>Simulador de crédito</h3><span class="pill">Rápido</span></div>
+      <div class="card-b">
+        <form id="form-calc">
+          <div class="field"><label for="expr">Calcula tu cuota (monto ÷ número de cuotas)</label>
+            <input id="expr" name="expr" placeholder="Ej: 5000000/12" autocomplete="off"></div>
+          <button class="btn btn-primary btn-block" type="submit">Calcular cuota</button>
+        </form>
+        <div id="calc-out" class="result big"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-h"><h3>Buscar oficinas y cajeros</h3><span class="pill gray">Ayuda</span></div>
+      <div class="card-b">
+        <form id="form-buscar">
+          <div class="field"><label for="q">Ciudad o dirección</label>
+            <input id="q" name="q" placeholder="Ej: Bogotá centro" autocomplete="off"></div>
+          <button class="btn btn-ghost btn-block" type="submit">Buscar</button>
+        </form>
+        <div id="resultado" class="result"></div>
+      </div>
+    </div>
   </div>
 </section>
 
+<!-- Banca en línea -->
+<section class="alt" id="login"><div class="section">
+  <div class="auth-grid">
+    <div class="auth-copy">
+      <h2>Banca en línea</h2>
+      <p>Ingresa para ver tus cuentas, movimientos y transferencias.</p>
+      <ul>
+        <li>Consulta saldos y movimientos en tiempo real</li>
+        <li>Transfiere y paga tus servicios</li>
+        <li>Descarga tus certificados y extractos</li>
+      </ul>
+    </div>
+    <div class="card login-card">
+      <div class="card-h"><h3>Ingresar</h3><span class="pill">Seguro</span></div>
+      <div class="card-b">
+        <!-- Remediado: sin credenciales en el cliente; se valida en el servidor. -->
+        <form id="form-login">
+          <div class="field"><label for="usuario">Usuario</label>
+            <input id="usuario" name="usuario" placeholder="Documento o usuario" autocomplete="off"></div>
+          <div class="field"><label for="clave">Clave</label>
+            <input id="clave" name="clave" type="password" placeholder="Clave" autocomplete="off"></div>
+          <button class="btn btn-primary btn-block" type="submit">Iniciar sesión</button>
+          <p id="login-msg" class="login-note muted"></p>
+        </form>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<!-- Resumen de cuenta (vista de ejemplo) -->
 <section class="section">
-  <div class="grid">
-    <!-- Acceso -->
-    <div class="card">
-      <span class="badge">ACCESO</span>
-      <h3>Entrar</h3>
-      <!-- Remediado: sin credenciales en el cliente; se valida en el servidor. -->
-      <form id="form-login">
-        <p><input name="usuario" placeholder="Usuario" autocomplete="off"></p>
-        <p><input name="clave" type="password" placeholder="Contraseña" autocomplete="off"></p>
-        <p><button class="btn btn-primary" type="submit">Iniciar sesión</button></p>
-        <p id="login-msg" class="section-sub"></p>
-      </form>
-    </div>
-
-    <!-- Búsqueda -->
-    <div class="card">
-      <span class="badge">BUSCAR</span>
-      <h3>Buscar movimientos</h3>
-      <!-- Remediado: el resultado se pinta con textContent. -->
-      <form id="form-buscar">
-        <p><input id="q" name="q" placeholder="Ej: transferencia"></p>
-        <p><button class="btn btn-ghost" type="submit">Buscar</button></p>
-      </form>
-      <div id="resultado" class="section-sub"></div>
-    </div>
-
-    <!-- Calculadora -->
-    <div class="card">
-      <span class="badge">CUOTAS</span>
-      <h3>Calculadora de cuotas</h3>
-      <!-- Remediado: evaluador aritmético acotado, sin eval. -->
-      <form id="form-calc">
-        <p><input id="expr" name="expr" placeholder="Ej: 1000/12"></p>
-        <p><button class="btn btn-ghost" type="submit">Calcular</button></p>
-      </form>
-      <div id="calc-out" class="section-sub"></div>
-    </div>
+  <div class="section-head"><h2>Resumen de tu cuenta</h2><p>Vista de ejemplo con datos ficticios.</p></div>
+  <p class="hello">Hola, Ana</p>
+  <div class="acct-grid">
+    <div class="acct"><div class="lab"><span>Cuenta de ahorros</span><span class="pill">Activa</span></div><div class="bal">$ 12.480.000</div><div class="no">•••• 4821</div></div>
+    <div class="acct"><div class="lab"><span>Cuenta corriente</span><span class="pill gray">Activa</span></div><div class="bal">$ 3.950.200</div><div class="no">•••• 7730</div></div>
+    <div class="acct credit"><div class="lab"><span>Tarjeta de crédito</span><span class="pill gray">Cupo</span></div><div class="bal">$ 8.200.000</div><div class="no">Disponible de $ 10.000.000</div></div>
   </div>
-
-  <div class="card mt-22">
-    <span class="badge">RECURSOS</span>
-    <h3>Documentación</h3>
-    <!-- Remediado: enlace externo con rel="noopener noreferrer". -->
-    <p><a href="https://owasp.org/www-project-top-ten/" target="_blank" rel="noopener noreferrer">OWASP Top 10</a></p>
+  <div class="dash-cols">
+    <div class="card">
+      <div class="card-h"><h3>Movimientos recientes</h3><a class="muted" href="#">Ver todos</a></div>
+      <div class="card-b flush">
+        <table class="txn">
+          <thead><tr><th>Fecha</th><th>Descripción</th><th>Categoría</th><th class="amt">Monto</th></tr></thead>
+          <tbody>
+            <tr><td>24 oct</td><td>Nómina — Empresa ACME</td><td><span class="tag-cat">Ingreso</span></td><td class="amt pos">+$ 4.200.000</td></tr>
+            <tr><td>23 oct</td><td>Supermercado La 14</td><td><span class="tag-cat">Compras</span></td><td class="amt neg">−$ 210.900</td></tr>
+            <tr><td>22 oct</td><td>Transferencia a J. Pérez</td><td><span class="tag-cat">Transferencia</span></td><td class="amt neg">−$ 500.000</td></tr>
+            <tr><td>21 oct</td><td>Pago tarjeta de crédito</td><td><span class="tag-cat">Pago</span></td><td class="amt neg">−$ 1.100.000</td></tr>
+            <tr><td>20 oct</td><td>Rendimientos cuenta ahorros</td><td><span class="tag-cat">Ingreso</span></td><td class="amt pos">+$ 32.450</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-h"><h3>Transferir</h3></div>
+      <div class="card-b">
+        <form onsubmit="return false">
+          <div class="field"><label for="dest">Destinatario</label><input id="dest" placeholder="Nombre o cuenta"></div>
+          <div class="field"><label for="monto">Monto</label><input id="monto" placeholder="$ 0"></div>
+          <button class="btn btn-accent btn-block" type="submit">Enviar</button>
+        </form>
+        <p class="muted mt-12">¿Dudas? Revisa los
+          <!-- Remediado: enlace externo con rel="noopener noreferrer". -->
+          <a href="https://owasp.org/www-project-top-ten/" target="_blank" rel="noopener noreferrer">términos y la documentación</a>.</p>
+      </div>
+    </div>
   </div>
 </section>
 
-<footer>
-  <span class="brand">VULN<span>BANK</span></span>
-  <small>Demo de entrenamiento · versión remediada</small>
+<footer class="site-footer">
+  <div class="wrap">
+    <div>
+      <div class="foot-brand">VulnBank</div>
+      <p>Banca en línea de entrenamiento.</p>
+      <p>Datos y saldos ficticios.</p>
+    </div>
+    <div><h4>Productos</h4><a href="#">Cuentas</a><a href="#">Tarjetas</a><a href="#herramientas">Créditos</a></div>
+    <div><h4>Ayuda</h4><a href="#ayuda" id="ayuda">Centro de ayuda</a><a href="#">Oficinas</a><a href="#">Seguridad</a></div>
+    <div><h4>Legal</h4><a href="#">Términos</a><a href="#">Privacidad</a><a href="/ciberseguridad/lab/">← Volver al lab</a></div>
+  </div>
+  <div class="foot-bottom">
+    <span>© 2026 VulnBank · Demo de entrenamiento (versión remediada)</span>
+    <span>No es un banco real · no ingreses datos verdaderos</span>
+  </div>
 </footer>
 
 </body>

@@ -31,7 +31,6 @@
     <p>Un mini-sitio para enseñar, en clase, cómo detectar y remediar fallos de seguridad. Se despliega en dos versiones: una <strong>vulnerable</strong> (para practicar) y una <strong>limpia</strong> (remediada).</p>
     <div class="hero-actions">
       <a class="btn btn-primary" href="/ciberseguridad/lab/app.html">Abrir VulnBank Demo</a>
-      <a class="btn btn-ghost" href="#como">Cómo usarlo</a>
     </div>
   </div>
 </section>
@@ -60,21 +59,6 @@
       <h3>Remediada</h3>
       <p>Las mismas funciones, con todos los fallos corregidos: sin secretos en el cliente, salidas seguras, sin eval, dependencias parcheadas y CSP estricta.</p>
     </div>
-  </div>
-</section>
-
-<!-- CÓMO USARLO -->
-<section class="section" id="como">
-  <h2 class="section-title">Cómo usarlo en <span>clase</span></h2>
-  <div class="card card-narrow">
-    <ol class="steps">
-      <li>Despliega la <strong>versión vulnerable</strong>: <code>bash tools/switch-lab.sh vuln</code> y publica.</li>
-      <li>Pásale la carpeta <code>ciberseguridad/lab/</code> a Claude y pídele detectar y remediar los fallos.</li>
-      <li>Revisa el antes/después con tus estudiantes y verifica con tu escáner (SAST/SCA/secretos).</li>
-      <li>Vuelve a la <strong>versión limpia</strong> o a la vulnerable cuando quieras:
-        <br><code>bash tools/switch-lab.sh clean</code> · <code>bash tools/switch-lab.sh vuln</code></li>
-    </ol>
-    <p class="mt-14">La guía del instructor y el manual completo listan los fallos y su remediación (no se publican como páginas).</p>
   </div>
 </section>
 
