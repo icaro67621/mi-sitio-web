@@ -1,28 +1,85 @@
-# Manual · Usar la VulnBank API endurecida con `curl` desde tu Mac
+# Guía para principiantes · Hablar con una API desde tu Mac
 
-> Guía para **usar la API correctamente** cuando está puesta la versión
-> **ENDURECIDA**: iniciar sesión, consultar tu cuenta, transferir, administrar…
-> y ver cómo responde a los ataques. Todo se hace desde la app **Terminal** del
-> Mac, copiando y pegando. Los datos son **ficticios**.
+> Esta guía es para alguien que **empieza en tecnología**. No necesitas saber
+> programar. Vamos a dar **8 pasos cortos**, y en cada uno te explico **qué
+> hacemos y por qué**. Tardarás unos 20 minutos.
+>
+> Usaremos la **VulnBank API** en su versión **endurecida** (la segura). El banco
+> es inventado: el dinero y las personas son ficticios, así que no puedes romper
+> nada.
 
 ---
 
-## 1. Antes de empezar
+## Primero, 4 ideas básicas
 
-1. Abre **Terminal** (Cmd + Espacio, escribe `Terminal`, Enter).
-2. `curl` ya viene instalado en macOS. Compruébalo:
+**1. ¿Qué es una API?**
+Piensa en un restaurante. Tú (el cliente) no entras a la cocina: le pides las
+cosas al **camarero**, y él te trae lo que pediste. Una **API** es ese camarero:
+un programa al que le pides datos ("¿cuánto dinero tengo?") y te responde.
 
-```bash
-curl --version
+**2. ¿Qué es `curl`?**
+Es una herramienta que ya viene en tu Mac para **hacerle pedidos a una API**
+escribiendo una línea de texto. Es como mandar una nota al camarero.
+
+**3. ¿Qué es un token?**
+Es como la **pulsera de un concierto**: cuando demuestras quién eres (con tu
+usuario y contraseña) te dan una pulsera. Después, en cada pedido, enseñas la
+pulsera y ya no tienes que volver a dar la contraseña. La pulsera **caduca a los
+15 minutos**.
+
+**4. ¿Qué es JSON?**
+Es la forma en que la API escribe sus respuestas: una lista ordenada de
+**nombre: valor**, entre llaves `{ }`. Por ejemplo:
+
+```json
+{ "nombre": "Laura", "saldo": 2450.75 }
 ```
 
-3. Comprueba que la API publicada es la **endurecida**:
+---
+
+## Paso 1 · Abrir la Terminal
+
+La **Terminal** es una ventana donde le das órdenes al Mac escribiendo.
+
+1. Pulsa **Cmd + Espacio** (se abre el buscador).
+2. Escribe `Terminal` y pulsa **Enter**.
+3. Se abre una ventana con texto. Ahí vas a **pegar** los comandos de esta guía.
+
+**Cómo usar los comandos de esta guía:** copia el texto del recuadro gris
+(Cmd + C), pégalo en la Terminal (Cmd + V) y pulsa **Enter**.
+
+---
+
+## Paso 2 · Guardar la dirección de la API
+
+La API vive en una dirección de Internet, como una página web. Como es larga, la
+guardamos con un nombre corto, **`API`**, igual que guardas un contacto en el
+móvil para no escribir el número cada vez.
 
 ```bash
-curl -s https://yellow-ground-024d78310.6.azurestaticapps.net/api/lab/version
+API="https://yellow-ground-024d78310.6.azurestaticapps.net/api/lab"
 ```
 
-Debes ver:
+No responde nada: es normal, solo la guardó.
+
+> Si cierras la Terminal, se olvida. Al abrirla de nuevo, repite este paso.
+
+---
+
+## Paso 3 · Saludar a la API
+
+Vamos a hacer el pedido más sencillo: preguntarle qué versión es.
+
+```bash
+curl "$API/version"
+```
+
+**Qué significa cada parte:**
+
+- `curl` → "quiero hacer un pedido".
+- `"$API/version"` → a qué dirección se lo hago: la de la API + `/version`.
+
+**Respuesta:**
 
 ```json
 {
@@ -31,290 +88,198 @@ Debes ver:
 }
 ```
 
-> Si dice `"vulnerable"`, pídele a Claude: **"Coloca el laboratorio de API
-> endurecida"** y espera 2–3 minutos.
+> Puede que al final aparezca un símbolo **`%`** pegado a la llave `}`. Es
+> normal: la Terminal del Mac lo pone para avisar de que la respuesta terminó.
+> Ignóralo.
 
-### 3 reglas que debes recordar
-
-| Regla | Por qué |
-|---|---|
-| Pon **siempre las URL entre comillas** `"…"` | La Terminal del Mac (zsh) interpreta `?` y da `no matches found`. |
-| El token va en la cabecera **`X-Auth-Token`** | Azure reserva `Authorization` para su propio login. |
-| El token **caduca a los 15 minutos** | Si recibes `401`, vuelve a iniciar sesión (paso 3). |
+Si ves esto, **ya hablaste con una API**. Si dice `"vulnerable"`, la versión
+segura no está puesta (pídele a Claude: *"coloca el laboratorio de API
+endurecida"*).
 
 ---
 
-## 2. Guarda la dirección de la API (una vez por ventana)
+## Paso 4 · Iniciar sesión (conseguir la pulsera)
+
+Ahora le decimos a la API quiénes somos. Somos **Laura** y su contraseña es
+`Laura2026!`.
 
 ```bash
-B="https://yellow-ground-024d78310.6.azurestaticapps.net/api/lab"
+curl -X POST "$API/auth/login" -H "Content-Type: application/json" -d '{"username":"laura","password":"Laura2026!"}'
 ```
 
-Esta variable dura mientras tengas abierta esa ventana de Terminal. Si abres
-otra ventana, vuelve a pegarla.
+**Qué significa cada parte:**
 
-Para empezar con los datos limpios (saldos y perfiles iniciales):
+- `-X POST` → "te **envío** datos" (hasta ahora solo **pedíamos** datos).
+- `"$API/auth/login"` → la ventanilla de iniciar sesión.
+- `-H "Content-Type: application/json"` → "lo que te mando está escrito en JSON".
+- `-d '{...}'` → los datos que enviamos: usuario y contraseña.
 
-```bash
-curl -s -X POST "$B/reset"
-```
-
----
-
-## 3. Iniciar sesión y guardar el token
-
-Usuarios de prueba:
-
-| Usuario | Contraseña | Cuenta | Rol |
-|---|---|---|---|
-| `laura` | `Laura2026!` | 5001 | cliente |
-| `carlos` | `123456` | 5002 | cliente |
-| `admin` | `Adm1n!VulnB4nk#2026` | 5003 | administrador |
-
-> Estas contraseñas son para ti como instructor. En la práctica vulnerable, las
-> de `carlos` y `admin` son parte del reto: no se las des a los alumnos.
-
-**Iniciar sesión como Laura y guardar su token en la variable `TOKEN`:**
-
-```bash
-TOKEN=$(curl -s -X POST "$B/auth/login" \
-  -H "Content-Type: application/json" \
-  -d '{"username":"laura","password":"Laura2026!"}' \
-  | sed -nE 's/.*"token": "([^"]+)".*/\1/p')
-echo "$TOKEN"
-```
-
-Debes ver una línea larga que empieza por `eyJ…` (es un JWT). Si sale vacía,
-revisa el usuario y la contraseña.
-
-**Ver la respuesta completa del login** (opcional):
-
-```bash
-curl -s -X POST "$B/auth/login" -H "Content-Type: application/json" \
-  -d '{"username":"laura","password":"Laura2026!"}'
-```
+**Respuesta (resumida):**
 
 ```json
 {
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9…",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEwMDEs...",
   "expiresIn": 900,
-  "user": { "id": 1001, "username": "laura", "fullName": "Laura Gómez", "email": "laura@vulnbank.example", "phone": "+34 600 111 222", "role": "customer", "accountId": 5001 }
+  "user": { "username": "laura", "fullName": "Laura Gómez", ... }
 }
 ```
 
-`expiresIn: 900` = el token vale 900 segundos (15 minutos).
+El texto largo que empieza por **`eyJ`** es tu **token** (tu pulsera).
+`"expiresIn": 900` significa que dura 900 segundos = 15 minutos.
 
 ---
 
-## 4. Usar la API como Laura (cliente)
+## Paso 5 · Guardar el token
 
-### 4.1 Ver mi perfil
+Para no copiarlo en cada pedido, lo guardamos con el nombre **`TOKEN`**:
 
-```bash
-curl -s "$B/users/me" -H "X-Auth-Token: $TOKEN"
-```
-
-Solo devuelve datos públicos: `id, username, fullName, email, phone, role,
-accountId`. Nada de contraseñas, DNI ni PIN.
-
-### 4.2 Cambiar mi email o teléfono
+1. Selecciona con el ratón **solo el texto del token** (desde `eyJ` hasta antes
+   de las comillas finales) y cópialo con **Cmd + C**.
+2. Escribe esto, pegando tu token donde dice `PEGA_AQUI_TU_TOKEN`:
 
 ```bash
-curl -s -X PATCH "$B/users/me" -H "X-Auth-Token: $TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"email":"laura.nueva@vulnbank.example","phone":"+34 611 222 333"}'
+TOKEN="PEGA_AQUI_TU_TOKEN"
 ```
 
-Solo se pueden cambiar **`email`** y **`phone`**, y deben tener un formato válido.
-
-### 4.3 Ver mi cuenta y saldo
-
-```bash
-curl -s "$B/accounts/5001" -H "X-Auth-Token: $TOKEN"
-```
-
-```json
-{ "id": 5001, "ownerId": 1001, "iban": "ES00 0000 0000 0000 0000 5001", "balance": 2450.75, "currency": "EUR", "ownerName": "Laura Gómez" }
-```
-
-### 4.4 Ver mis movimientos
-
-```bash
-curl -s "$B/accounts/5001/transactions?limit=5" -H "X-Auth-Token: $TOKEN"
-```
-
-`limit` acepta de **1 a 50**. Sin `limit` devuelve 20.
-
-### 4.5 Hacer una transferencia
-
-```bash
-curl -s -X POST "$B/transfers" -H "X-Auth-Token: $TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"fromAccountId":5001,"toAccountId":5002,"amount":25.50}'
-```
-
-```json
-{ "ok": true, "from": { "id": 5001, "balance": 2425.25 }, "to": { "id": 5002 } }
-```
-
-Reglas que aplica la API endurecida:
-
-- `fromAccountId` tiene que ser **tu** cuenta.
-- `toAccountId` tiene que existir y ser distinta de la de origen.
-- `amount` tiene que ser un **número** (sin comillas), **positivo**, con **2
-  decimales como máximo**, **≤ 10000** y **≤ tu saldo**.
-- La respuesta **no** muestra el saldo de la cuenta destino (no es tuyo).
-
-### 4.6 Vista previa de un enlace
-
-Solo admite enlaces `https` de los dominios del banco:
-
-```bash
-curl -s "$B/tools/preview?url=https://cdn.vulnbank.example/logo.png" -H "X-Auth-Token: $TOKEN"
-```
-
-Dominios permitidos: `cdn.vulnbank.example` y `www.vulnbank.example`.
+Quedará algo así (el tuyo será distinto): `TOKEN="eyJhbGciOiJIUzI1NiIs...Xyz"`
 
 ---
 
-## 5. Usar la API como administrador
+## Paso 6 · Ver mis datos y mi dinero
+
+Ahora enseñamos la pulsera en cada pedido. Se hace con `-H "X-Auth-Token: $TOKEN"`,
+que significa: *"esta es mi pulsera"*.
+
+**Mi perfil:**
 
 ```bash
-ADMIN=$(curl -s -X POST "$B/auth/login" \
-  -H "Content-Type: application/json" \
-  -d '{"username":"admin","password":"Adm1n!VulnB4nk#2026"}' \
-  | sed -nE 's/.*"token": "([^"]+)".*/\1/p')
-
-curl -s "$B/admin/users" -H "X-Auth-Token: $ADMIN"
+curl "$API/users/me" -H "X-Auth-Token: $TOKEN"
 ```
 
-El admin ve la lista de usuarios **sin datos sensibles**. Si lo intenta Laura:
+Verás tu nombre, email y teléfono. Fíjate en lo que **no** aparece: ni la
+contraseña ni el DNI. La API segura **solo enseña lo necesario**.
+
+**Mi cuenta y saldo** (la cuenta de Laura es la **5001**):
 
 ```bash
-curl -s "$B/admin/users" -H "X-Auth-Token: $TOKEN"
+curl "$API/accounts/5001" -H "X-Auth-Token: $TOKEN"
 ```
 
 ```json
-{ "error": "Acceso denegado" }
+{ "id": 5001, "iban": "ES00 0000 0000 0000 0000 5001", "balance": 2450.75, "currency": "EUR", ... }
+```
+
+`balance` es el saldo: **2450,75 €**.
+
+---
+
+## Paso 7 · Enviar dinero a Carlos
+
+Vamos a transferir **10 €** de la cuenta de Laura (5001) a la de Carlos (5002):
+
+```bash
+curl -X POST "$API/transfers" -H "X-Auth-Token: $TOKEN" -H "Content-Type: application/json" -d '{"fromAccountId":5001,"toAccountId":5002,"amount":10}'
+```
+
+Los datos que enviamos (`-d`) dicen: desde la cuenta **5001**, a la **5002**,
+**10** euros.
+
+**Respuesta:**
+
+```json
+{ "ok": true, "from": { "id": 5001, "balance": 2440.75 }, "to": { "id": 5002 } }
+```
+
+`"ok": true` = la transferencia salió bien, y ahora tienes **2440,75 €**.
+
+---
+
+## Paso 8 · Intentar hacer trampa (y ver cómo la API se defiende)
+
+Una API segura **comprueba todo** antes de obedecer. Probemos tres trampas:
+
+**Trampa 1 · Mirar la cuenta de otra persona.** Pedimos la cuenta de Carlos
+(5002) con la pulsera de Laura:
+
+```bash
+curl "$API/accounts/5002" -H "X-Auth-Token: $TOKEN"
+```
+
+```json
+{ "error": "Cuenta no encontrada" }
+```
+
+**Por qué:** la API revisa que la cuenta sea **tuya**. Como no lo es, responde
+como si no existiera (así ni siquiera revela que existe).
+
+**Trampa 2 · Enviar dinero "negativo".** Si mandas **−1000 €** a Carlos, en un
+sistema mal hecho eso le **quitaría** 1000 € a él y te los daría a ti:
+
+```bash
+curl -X POST "$API/transfers" -H "X-Auth-Token: $TOKEN" -H "Content-Type: application/json" -d '{"fromAccountId":5001,"toAccountId":5002,"amount":-1000}'
+```
+
+```json
+{ "error": "amount debe ser un número positivo con máximo 2 decimales" }
+```
+
+**Por qué:** la API comprueba que el importe sea positivo y que tengas saldo.
+
+**Trampa 3 · Pedir datos sin pulsera.** Quitamos la parte del token:
+
+```bash
+curl "$API/users/me"
+```
+
+```json
+{ "error": "Falta un token válido (cabecera X-Auth-Token)" }
+```
+
+**Por qué:** sin identificarte, la API no te da información privada.
+
+> **Esta es la idea principal de la seguridad en APIs:** la API **nunca debe
+> confiar** en lo que le pide el cliente. Debe comprobar **quién eres**, **si lo
+> que pides es tuyo** y **si los datos tienen sentido**. En la versión
+> vulnerable del laboratorio, estas tres trampas **sí funcionan**.
+
+---
+
+## Para terminar · Dejar todo como al principio
+
+Esto devuelve los saldos a sus valores iniciales, para la siguiente persona:
+
+```bash
+curl -X POST "$API/reset"
+```
+
+```json
+{ "ok": true, "message": "Datos del laboratorio restaurados" }
 ```
 
 ---
 
-## 6. Ver el código HTTP de cada respuesta
+## Si algo sale mal
 
-Añade `-i` para ver la línea de estado y las cabeceras:
-
-```bash
-curl -s -i "$B/accounts/5001" -H "X-Auth-Token: $TOKEN"
-```
-
-O solo el código, al final de la respuesta:
-
-```bash
-curl -s -w '\nHTTP %{http_code}\n' "$B/accounts/5001" -H "X-Auth-Token: $TOKEN"
-```
-
-### Qué significa cada respuesta
-
-| Código | Mensaje típico | Qué hacer |
+| Ves esto | Qué pasa | Qué hacer |
 |---|---|---|
-| `200` | (datos) | Todo bien. |
-| `400` | `amount debe ser…`, `Campos no permitidos…`, `limit debe estar entre 1 y 50` | Corrige los datos que envías. |
-| `401` | `Credenciales inválidas` | Usuario o contraseña incorrectos. |
-| `401` | `Falta un token válido (cabecera X-Auth-Token)` | Token ausente, mal copiado o caducado: repite el paso 3. |
-| `403` | `Acceso denegado` | Tu rol no tiene permiso (solo admin). |
-| `404` | `Cuenta no encontrada` | La cuenta no existe **o no es tuya**. |
-| `410` | `La API v1 está retirada` | Usa `/api/lab/…` (sin `v1`). |
-| `429` | `Demasiados intentos. Espera 15 minutos.` | 5 logins fallidos: espera o ejecuta `curl -s -X POST "$B/reset"`. |
-| `500` | `Error interno` + `requestId` | Error del servidor; no muestra detalles internos. |
+| `Falta un token válido` | La pulsera caducó (15 min) o no la guardaste bien. | Repite los pasos 4 y 5. |
+| `Credenciales inválidas` | Usuario o contraseña mal escritos. | Copia el comando del paso 4 tal cual. |
+| `Demasiados intentos` | Fallaste la contraseña 5 veces: la API te bloquea (¡es una defensa!). | Ejecuta el comando de "Para terminar" y vuelve al paso 4. |
+| `zsh: no matches found` | La dirección quedó sin comillas. | Copia el comando completo, con sus comillas. |
+| `Could not resolve host` | No hay Internet o el paso 2 no se hizo. | Revisa la conexión y repite el paso 2. |
+| No pasa nada al pulsar Enter | Faltó cerrar unas comillas. | Pulsa **Ctrl + C** y vuelve a pegar el comando. |
 
 ---
 
-## 7. Demostración: los ataques ya no funcionan
+## Mini-diccionario
 
-Con `TOKEN` de Laura cargado, pega cada línea y compara con la tabla.
-
-| # | Ataque | Comando | Respuesta endurecida |
-|---|---|---|---|
-| V1 | Leer la cuenta de Carlos | `curl -s "$B/accounts/5002" -H "X-Auth-Token: $TOKEN"` | `404 Cuenta no encontrada` |
-| V2 | Token sin firma (`alg: none`) | `curl -s "$B/users/me" -H "X-Auth-Token: eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJzdWIiOjEwMDN9."` | `401` |
-| V4 | Datos sensibles en el perfil | `curl -s "$B/users/me" -H "X-Auth-Token: $TOKEN"` | Sin `password`, `dni`, `pin` |
-| V5 | Ponerse admin | `curl -s -X PATCH "$B/users/me" -H "X-Auth-Token: $TOKEN" -H "Content-Type: application/json" -d '{"role":"admin"}'` | `400 Campos no permitidos: role` |
-| V6 | Panel de admin siendo cliente | `curl -s "$B/admin/users" -H "X-Auth-Token: $TOKEN"` | `403 Acceso denegado` |
-| V7 | Transferencia negativa | `curl -s -X POST "$B/transfers" -H "X-Auth-Token: $TOKEN" -H "Content-Type: application/json" -d '{"fromAccountId":5001,"toAccountId":5002,"amount":-1000}'` | `400 amount debe ser un número positivo…` |
-| V8 | SSRF a metadatos | `curl -s "$B/tools/preview?url=http://169.254.169.254/latest/meta-data/" -H "X-Auth-Token: $TOKEN"` | `400 Destino no permitido` |
-| V9 | Endpoint de depuración | `curl -s "$B/debug" -H "X-Auth-Token: $TOKEN"` | `404 Ruta no encontrada` |
-| V9 | CORS desde otra web | `curl -s -i "$B/version" -H "Origin: https://evil.example" \| grep -i access-control` | No aparece nada |
-| V10 | API antigua | `curl -s "$B/v1/users/1002"` | `410 La API v1 está retirada` |
-| V11 | Inyección NoSQL | `curl -s -X POST "$B/auth/login" -H "Content-Type: application/json" -d '{"username":"admin","password":{"$ne":""}}'` | `400 username y password deben ser texto` |
-| V12 | Pedir 20 000 registros | `curl -s "$B/accounts/5001/transactions?limit=20000" -H "X-Auth-Token: $TOKEN"` | `400 limit debe estar entre 1 y 50` |
-
-**V3 · Fuerza bruta** (bloqueo al 5.º intento):
-
-```bash
-for p in uno dos tres cuatro cinco seis; do
-  curl -s -o /dev/null -w "$p → HTTP %{http_code}\n" -X POST "$B/auth/login" \
-    -H "Content-Type: application/json" -d "{\"username\":\"carlos\",\"password\":\"$p\"}"
-done
-```
-
-Verás `401` cinco veces y después `429`. Desbloquea con `curl -s -X POST "$B/reset"`
-y vuelve a iniciar sesión (paso 3).
-
----
-
-## 8. Todo de una vez (script para copiar y pegar)
-
-Pega el bloque completo en la Terminal. Hace el recorrido entero y muestra cada
-resultado con su código HTTP:
-
-```bash
-B="https://yellow-ground-024d78310.6.azurestaticapps.net/api/lab"
-paso() { printf '\n\033[1;32m== %s\033[0m\n' "$1"; }
-curl -s -X POST "$B/reset" >/dev/null
-
-paso "Versión"
-curl -s "$B/version"
-
-paso "Login como laura"
-TOKEN=$(curl -s -X POST "$B/auth/login" -H "Content-Type: application/json" \
-  -d '{"username":"laura","password":"Laura2026!"}' | sed -nE 's/.*"token": "([^"]+)".*/\1/p')
-[ -n "$TOKEN" ] && echo "Token OK" || echo "ERROR: no hay token"
-
-paso "Mi perfil"
-curl -s -w '\nHTTP %{http_code}\n' "$B/users/me" -H "X-Auth-Token: $TOKEN"
-
-paso "Mi cuenta"
-curl -s -w '\nHTTP %{http_code}\n' "$B/accounts/5001" -H "X-Auth-Token: $TOKEN"
-
-paso "Transferir 25.50 a Carlos"
-curl -s -w '\nHTTP %{http_code}\n' -X POST "$B/transfers" -H "X-Auth-Token: $TOKEN" \
-  -H "Content-Type: application/json" -d '{"fromAccountId":5001,"toAccountId":5002,"amount":25.50}'
-
-paso "ATAQUE: leer la cuenta de Carlos (debe dar 404)"
-curl -s -w '\nHTTP %{http_code}\n' "$B/accounts/5002" -H "X-Auth-Token: $TOKEN"
-
-paso "ATAQUE: transferencia negativa (debe dar 400)"
-curl -s -w '\nHTTP %{http_code}\n' -X POST "$B/transfers" -H "X-Auth-Token: $TOKEN" \
-  -H "Content-Type: application/json" -d '{"fromAccountId":5001,"toAccountId":5002,"amount":-1000}'
-
-paso "ATAQUE: panel de admin siendo cliente (debe dar 403)"
-curl -s -w '\nHTTP %{http_code}\n' "$B/admin/users" -H "X-Auth-Token: $TOKEN"
-
-paso "Restaurar datos"
-curl -s -X POST "$B/reset"
-```
-
----
-
-## 9. Problemas frecuentes en Mac
-
-| Síntoma | Solución |
+| Palabra | Qué significa |
 |---|---|
-| `zsh: no matches found: …?limit=5` | Pon la URL entre comillas dobles: `"$B/…?limit=5"`. |
-| `zsh: event not found` | Usa comillas **simples** `'…'` en el `-d` cuando haya `!` (como en `Laura2026!`). |
-| `echo "$TOKEN"` sale vacío | El login falló: ejecuta el login sin el `sed` (paso 3, opcional) y lee el error. |
-| `401 Falta un token válido` | Token caducado (15 min) o variable perdida al abrir otra ventana: repite pasos 2 y 3. |
-| `429 Demasiados intentos` | `curl -s -X POST "$B/reset"` y vuelve a iniciar sesión. |
-| La respuesta sale en una sola línea larga | Añade al final ` \| python3 -m json.tool` (o instala `jq` con `brew install jq` y usa ` \| jq`). |
-| `curl: (6) Could not resolve host` | Revisa la conexión a Internet y que la variable `B` esté bien escrita. |
+| **API** | Programa que recibe pedidos y devuelve datos (el camarero). |
+| **curl** | Herramienta del Mac para hacerle pedidos a una API. |
+| **GET** | Pedir datos (lo que hace `curl` si no dices nada). |
+| **POST** | Enviar datos (`-X POST`), por ejemplo para iniciar sesión o transferir. |
+| **Token** | Tu "pulsera" para demostrar quién eres en cada pedido. Caduca. |
+| **JSON** | Formato de las respuestas: `{ "nombre": valor }`. |
+| **Endpoint** | Cada "ventanilla" de la API, como `/version` o `/accounts/5001`. |
+| **Cabecera** (`-H`) | Información extra que acompaña al pedido, como la pulsera. |
