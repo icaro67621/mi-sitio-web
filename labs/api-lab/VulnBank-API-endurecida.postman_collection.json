@@ -1,0 +1,321 @@
+{
+  "info": {
+    "name": "VulnBank API (endurecida)",
+    "description": "Pedidos de la \"Guía para principiantes · Hablar con una API usando Postman\". Datos ficticios. El login guarda el token automáticamente.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "api",
+      "value": "https://yellow-ground-024d78310.6.azurestaticapps.net/api/lab"
+    },
+    {
+      "key": "token",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "3 · Saludar a la API",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Es la versión endurecida\", function () { pm.expect(pm.response.json().version).to.eql(\"endurecida\"); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{api}}/version",
+          "host": [
+            "{{api}}"
+          ],
+          "path": [
+            "version"
+          ]
+        }
+      }
+    },
+    {
+      "name": "4 · Iniciar sesión como Laura",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });",
+              "const token = pm.response.json().token;\nif (token) {\n  pm.collectionVariables.set(\"token\", token);\n  if (pm.environment.name) pm.environment.set(\"token\", token);\n  console.log(\"Token guardado\");\n}"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"laura\",\n  \"password\": \"Laura2026!\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{api}}/auth/login",
+          "host": [
+            "{{api}}"
+          ],
+          "path": [
+            "auth",
+            "login"
+          ]
+        }
+      }
+    },
+    {
+      "name": "6 · Mi perfil",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-Auth-Token",
+            "value": "{{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{api}}/users/me",
+          "host": [
+            "{{api}}"
+          ],
+          "path": [
+            "users",
+            "me"
+          ]
+        }
+      }
+    },
+    {
+      "name": "6 · Mi cuenta y saldo",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-Auth-Token",
+            "value": "{{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{api}}/accounts/5001",
+          "host": [
+            "{{api}}"
+          ],
+          "path": [
+            "accounts",
+            "5001"
+          ]
+        }
+      }
+    },
+    {
+      "name": "7 · Enviar 10 € a Carlos",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-Auth-Token",
+            "value": "{{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fromAccountId\": 5001,\n  \"toAccountId\": 5002,\n  \"amount\": 10\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{api}}/transfers",
+          "host": [
+            "{{api}}"
+          ],
+          "path": [
+            "transfers"
+          ]
+        }
+      }
+    },
+    {
+      "name": "8 · Trampa 1: mirar la cuenta de Carlos",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Responde 404\", function () { pm.response.to.have.status(404); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-Auth-Token",
+            "value": "{{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{api}}/accounts/5002",
+          "host": [
+            "{{api}}"
+          ],
+          "path": [
+            "accounts",
+            "5002"
+          ]
+        }
+      }
+    },
+    {
+      "name": "8 · Trampa 2: enviar dinero negativo",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Responde 400\", function () { pm.response.to.have.status(400); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-Auth-Token",
+            "value": "{{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fromAccountId\": 5001,\n  \"toAccountId\": 5002,\n  \"amount\": -1000\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{api}}/transfers",
+          "host": [
+            "{{api}}"
+          ],
+          "path": [
+            "transfers"
+          ]
+        }
+      }
+    },
+    {
+      "name": "8 · Trampa 3: pedir datos sin pulsera",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Responde 401\", function () { pm.response.to.have.status(401); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{api}}/users/me",
+          "host": [
+            "{{api}}"
+          ],
+          "path": [
+            "users",
+            "me"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Para terminar · Restaurar datos",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{api}}/reset",
+          "host": [
+            "{{api}}"
+          ],
+          "path": [
+            "reset"
+          ]
+        }
+      }
+    }
+  ]
+}
