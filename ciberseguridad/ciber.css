@@ -283,3 +283,7 @@ footer small { font-family: var(--font-mono); color: var(--muted); font-size: 13
 .mt-22 { margin-top: 22px; }
 .mt-14 { margin-top: 14px; }
 .steps { padding-left: 20px; line-height: 2; color: var(--text); }
+
+/* Indicador de la versión publicada de un laboratorio */
+.lab-status { margin-top: 14px; font-family: var(--font-mono); }
+.lab-status .badge { margin: 0 0 0 6px; vertical-align: middle; }

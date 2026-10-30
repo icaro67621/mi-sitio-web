@@ -35,7 +35,10 @@ jobs:
           expect /CLAUDE.md 404
           expect /tools/check-api-lab.js 404
           curl -s "$SITE/ciberseguridad/" | grep -q 'Lab 02 · Seguridad en APIs' && echo "✔ Tarjeta Lab 02 en la portada" || { echo "✘ Falta la tarjeta Lab 02"; fail=1; }
-          echo; echo "Versión activa:"; curl -s "$SITE/api/lab/version"; echo
+          expect /ciberseguridad/lab/lab-version.js 200
+          echo; echo "Versión activa (Lab 02 API):"; curl -s "$SITE/api/lab/version"; echo
+          if curl -s "$SITE/ciberseguridad/lab/assets/config.js" | grep -qE 'paymentsApiKey|jwtSigningSecret'; then v=VULNERABLE; else v=LIMPIA; fi
+          echo "Versión publicada (Lab 03 VulnBank web): $v"
           exit $fail
       - name: Las 12 vulnerabilidades
         run: node tools/check-api-lab.js "${{ inputs.site }}"

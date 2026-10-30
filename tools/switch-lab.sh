@@ -31,10 +31,30 @@ PATHS=(
   "ciberseguridad/lab/app.html"
   "ciberseguridad/lab/assets"
   "ciberseguridad/lab/package.json"
-  "staticwebapp.config.json"
 )
 
 git checkout "$SRC" -- "${PATHS[@]}"
+
+# staticwebapp.config.json NO se restaura entero (tiene configuración de otros
+# laboratorios); solo se pone o se quita la CSP débil de /ciberseguridad/lab/*.
+MODE="$1" node - <<'NODE'
+const fs = require('fs');
+const f = 'staticwebapp.config.json';
+const c = JSON.parse(fs.readFileSync(f, 'utf8'));
+c.routes = c.routes.filter((r) => r.route !== '/ciberseguridad/lab/*');
+if (/^vuln/.test(process.env.MODE)) {
+  const i = c.routes.findIndex((r) => r.route === '/ciberseguridad/*');
+  c.routes.splice(i < 0 ? c.routes.length : i, 0, {
+    route: '/ciberseguridad/lab/*',
+    headers: {
+      'X-Robots-Tag': 'noindex, nofollow',
+      'Content-Security-Policy': "default-src 'self' 'unsafe-inline' 'unsafe-eval' https: data:; img-src 'self' data: http: https:; frame-ancestors 'none'",
+    },
+  });
+}
+fs.writeFileSync(f, JSON.stringify(c, null, 2) + '\n');
+NODE
+PATHS+=("staticwebapp.config.json")
 
 echo "✔ Laboratorio cambiado a la versión $NAME (desde $SRC)."
 echo "Archivos actualizados:"
