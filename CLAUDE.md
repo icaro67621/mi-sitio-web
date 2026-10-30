@@ -10,6 +10,7 @@ La sección `/ciberseguridad` tiene laboratorios de seguridad con dos versiones.
 - Manual: `labs/api-lab/MANUAL.md` (y su PDF `labs/api-lab/Manual-Lab-API.pdf`).
 - Manual de uso de la API endurecida con curl en Mac: `labs/api-lab/MANUAL-API-ENDURECIDA-MAC.md` (+ PDF).
 - Lo mismo con Postman: `labs/api-lab/MANUAL-API-ENDURECIDA-POSTMAN.md` (+ PDF) y la colección `labs/api-lab/VulnBank-API-endurecida.postman_collection.json`.
+- Guías para principiantes del lab VULNERABLE (los 12 ataques): `labs/api-lab/MANUAL-API-VULNERABLE-MAC.md` y `labs/api-lab/MANUAL-API-VULNERABLE-POSTMAN.md` (+ PDF), con la colección `labs/api-lab/VulnBank-API-vulnerable.postman_collection.json`.
 
 Cuando el usuario diga **"coloca el laboratorio de API vulnerable"** (o similar):
 

