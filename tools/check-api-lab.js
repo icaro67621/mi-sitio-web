@@ -56,7 +56,7 @@ async function login(username, password) {
   const r = await call('POST', 'auth/login', { body: { username, password } });
   return r.json && r.json.token;
 }
-const auth = (t) => ({ Authorization: 'Bearer ' + t });
+const auth = (t) => ({ 'X-Auth-Token': t });
 
 const CHECKS = [
   ['V1', 'BOLA: Laura lee la cuenta 5002 de Carlos', async (t) => {

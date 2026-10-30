@@ -74,9 +74,13 @@ function verifyJwt(token) {
 }
 
 function currentUser(req) {
+  // El token va en la cabecera X-Auth-Token. (Azure Static Web Apps reserva
+  // la cabecera Authorization para su propio login y la reemplaza; se acepta
+  // también "Authorization: Bearer" para el servidor local.)
   const auth = req.headers.authorization || '';
-  if (!auth.startsWith('Bearer ')) return null;
-  const payload = verifyJwt(auth.slice(7));
+  const token = req.headers['x-auth-token'] || (auth.startsWith('Bearer ') ? auth.slice(7) : '');
+  if (!token) return null;
+  const payload = verifyJwt(token);
   if (!payload) return null;
   // El rol se lee SIEMPRE del servidor, nunca del token.
   return db.users.find((u) => u.id === payload.sub) || null;
@@ -173,7 +177,7 @@ async function route(req, path, method) {
   }
 
   const me = currentUser(req);
-  if (!me) return [401, { error: 'Falta un token válido (Authorization: Bearer ...)' }];
+  if (!me) return [401, { error: 'Falta un token válido (cabecera X-Auth-Token)' }];
 
   if (path === 'users/me' && method === 'GET') return [200, publicUser(me)];
 

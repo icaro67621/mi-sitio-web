@@ -14,7 +14,7 @@
     }
     var headers = {};
     var token = $('token').value.trim();
-    if (token) headers.Authorization = 'Bearer ' + token;
+    if (token) headers['X-Auth-Token'] = token;
     var opts = { method: method, headers: headers };
     if (bodyText && method !== 'GET') {
       headers['Content-Type'] = 'application/json';

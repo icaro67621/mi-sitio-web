@@ -82,9 +82,13 @@ function getBody(req) {
 }
 
 function currentUser(req) {
+  // El token va en la cabecera X-Auth-Token. (Azure Static Web Apps reserva
+  // la cabecera Authorization para su propio login y la reemplaza; se acepta
+  // también "Authorization: Bearer" para el servidor local.)
   const auth = req.headers.authorization || '';
-  if (!auth.startsWith('Bearer ')) return null;
-  const payload = verifyJwt(auth.slice(7));
+  const token = req.headers['x-auth-token'] || (auth.startsWith('Bearer ') ? auth.slice(7) : '');
+  if (!token) return null;
+  const payload = verifyJwt(token);
   if (!payload) return null;
   // Se confía en el contenido del token tal cual.
   return db.users.find((u) => u.id === payload.sub) || null;
@@ -150,7 +154,7 @@ async function route(req, path, method) {
 
   // A partir de aquí hace falta un token.
   const me = currentUser(req);
-  if (!me) return [401, { error: 'Falta un token válido (Authorization: Bearer ...)' }];
+  if (!me) return [401, { error: 'Falta un token válido (cabecera X-Auth-Token)' }];
 
   if (path === 'users/me' && method === 'GET') {
     return [200, me]; // [V4] exposición excesiva: hash, DNI, PIN...
@@ -216,7 +220,7 @@ module.exports = async function (context, req) {
     'Access-Control-Allow-Origin': origin || '*',
     'Access-Control-Allow-Credentials': 'true',
     'Access-Control-Allow-Methods': 'GET, POST, PATCH, PUT, DELETE, OPTIONS',
-    'Access-Control-Allow-Headers': '*',
+    'Access-Control-Allow-Headers': '*, X-Auth-Token',
     // [V9] Cabeceras que revelan la tecnología.
     'X-Powered-By': 'VulnBank-API/0.9 Node ' + process.version,
   };
