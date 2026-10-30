@@ -1,0 +1,41 @@
+name: Validar laboratorio de APIs
+
+# Ejecución manual: Actions → "Validar laboratorio de APIs" → Run workflow.
+# Comprueba contra el sitio publicado que la API responde, que las 12
+# vulnerabilidades coinciden con la versión activa y que las rutas
+# privadas no se sirven.
+on:
+  workflow_dispatch:
+    inputs:
+      site:
+        description: "URL del sitio"
+        default: "https://yellow-ground-024d78310.6.azurestaticapps.net"
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          persist-credentials: false
+      - name: Página y rutas privadas
+        env:
+          SITE: ${{ inputs.site }}
+        run: |
+          fail=0
+          expect() { code=$(curl -s -o /dev/null -w '%{http_code}' "$SITE$1"); if [ "$code" = "$2" ]; then echo "✔ $1 → $code"; else echo "✘ $1 → $code (esperado $2)"; fail=1; fi; }
+          expect /ciberseguridad/api-lab/ 200
+          expect /ciberseguridad/api-lab/api-lab.js 200
+          expect /api/lab/version 200
+          expect /labs/api-lab/MANUAL.md 404
+          expect /labs/api-lab/vuln/index.js 404
+          expect /CLAUDE.md 404
+          expect /tools/check-api-lab.js 404
+          curl -s "$SITE/ciberseguridad/" | grep -q 'Lab 02 · Seguridad en APIs' && echo "✔ Tarjeta Lab 02 en la portada" || { echo "✘ Falta la tarjeta Lab 02"; fail=1; }
+          echo; echo "Versión activa:"; curl -s "$SITE/api/lab/version"; echo
+          exit $fail
+      - name: Las 12 vulnerabilidades
+        run: node tools/check-api-lab.js "${{ inputs.site }}"
