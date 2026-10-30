@@ -1,4 +1,7 @@
 {
+  "platform": {
+    "apiRuntime": "node:20"
+  },
   "globalHeaders": {
     "Content-Security-Policy": "default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://i.ytimg.com; frame-src https://www.youtube-nocookie.com https://open.spotify.com; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests",
     "Strict-Transport-Security": "max-age=31536000",
@@ -31,6 +34,14 @@
     },
     {
       "route": "/ciberseguridad/lab/package.json",
+      "statusCode": 404
+    },
+    {
+      "route": "/labs/*",
+      "statusCode": 404
+    },
+    {
+      "route": "/CLAUDE.md",
       "statusCode": 404
     },
     {

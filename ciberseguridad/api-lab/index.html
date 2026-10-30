@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Lab de Seguridad en APIs · Ciberseguridad</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800&family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/ciberseguridad/ciber.css" />
+  <link rel="stylesheet" href="/ciberseguridad/api-lab/api-lab.css" />
+</head>
+<body>
+
+<!-- NAVEGACIÓN -->
+<nav>
+  <a class="brand" href="/ciberseguridad/">CYBER<span>SEC</span></a>
+  <div class="nav-links">
+    <a href="/ciberseguridad/#laboratorios">Laboratorios</a>
+    <a href="#consola">Consola</a>
+    <a href="#endpoints">Endpoints</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero hero-small">
+  <div class="hero-text">
+    <p class="kicker">&gt; root@secops:~$ curl /api/lab</p>
+    <h1>Seguridad en <span>APIs</span></h1>
+    <p>VulnBank API: una API bancaria real (ficticia) para practicar el <strong>OWASP API Security Top 10</strong>. Se publica en dos versiones: <strong>vulnerable</strong> (para atacar) y <strong>endurecida</strong> (con los fallos corregidos).</p>
+    <p class="api-status">API activa: <span id="api-version" class="badge">comprobando…</span></p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="#consola">Abrir la consola</a>
+      <a class="btn btn-ghost" href="/api/lab/" target="_blank" rel="noopener noreferrer">Ver /api/lab</a>
+    </div>
+  </div>
+</section>
+
+<!-- AVISO -->
+<section class="section">
+  <div class="card card-narrow card-danger">
+    <span class="badge red">AVISO</span>
+    <h3>Entorno de entrenamiento</h3>
+    <p>La versión <strong>vulnerable</strong> contiene fallos <strong>intencionales</strong>. Todos los datos, contraseñas y "secretos" son <strong>ficticios</strong>, viven solo en memoria y se pueden restaurar en cualquier momento. El SSRF está simulado: la API no hace peticiones reales a ningún sitio. Ataca <strong>solo</strong> esta API (<code>/api/lab/…</code>), nunca el resto del sitio ni otros sistemas.</p>
+  </div>
+</section>
+
+<!-- VERSIONES -->
+<section class="section section-alt">
+  <h2 class="section-title">Dos <span>versiones</span></h2>
+  <p class="section-sub">Mismos endpoints, mismos usuarios, comportamiento distinto.</p>
+  <div class="grid">
+    <div class="card">
+      <span class="badge red">VULNERABLE</span>
+      <h3>Para atacar</h3>
+      <p>12 vulnerabilidades: BOLA, JWT sin firma, enumeración, exposición de datos, asignación masiva, BFLA, lógica de negocio, SSRF, mala configuración, API antigua, inyección NoSQL y consumo sin límite.</p>
+    </div>
+    <div class="card">
+      <span class="badge">ENDURECIDA</span>
+      <h3>Corregida</h3>
+      <p>Autorización por objeto y por función, JWT estricto con caducidad, límite de intentos, DTOs, listas blancas, validación de tipos, errores genéricos y paginación limitada.</p>
+    </div>
+    <div class="card">
+      <span class="badge blue">USUARIOS</span>
+      <h3>Cuentas de prueba</h3>
+      <p class="mono">laura / Laura2026! → cuenta 5001<br />carlos / ?????? → cuenta 5002<br />admin / ?????? → cuenta 5003</p>
+      <p>Empiezas como <strong>laura</strong>. Las demás contraseñas son parte del reto.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CONSOLA -->
+<section class="section" id="consola">
+  <h2 class="section-title">Conso<span>la</span></h2>
+  <p class="section-sub">Envía peticiones a la API sin instalar nada. También puedes usar <code>curl</code> o Postman.</p>
+
+  <div class="card console">
+    <div class="console-row">
+      <button class="btn btn-ghost btn-sm" type="button" id="btn-login">1 · Iniciar sesión como laura</button>
+      <button class="btn btn-ghost btn-sm" type="button" id="btn-reset">Restaurar datos</button>
+    </div>
+
+    <label for="token">Token (Authorization: Bearer …)</label>
+    <input id="token" type="text" spellcheck="false" autocomplete="off" placeholder="Pulsa «Iniciar sesión» o pega aquí un token" />
+
+    <div class="console-row">
+      <div class="field-method">
+        <label for="method">Método</label>
+        <select id="method">
+          <option>GET</option><option>POST</option><option>PATCH</option><option>PUT</option><option>DELETE</option>
+        </select>
+      </div>
+      <div class="field-path">
+        <label for="path">Ruta</label>
+        <input id="path" type="text" spellcheck="false" value="/api/lab/version" />
+      </div>
+    </div>
+
+    <label for="body">Cuerpo JSON (para POST / PATCH)</label>
+    <textarea id="body" rows="5" spellcheck="false" placeholder='{"clave": "valor"}'></textarea>
+
+    <div class="console-row">
+      <button class="btn btn-primary" type="button" id="btn-send">Enviar petición</button>
+      <span id="meta" class="mono muted"></span>
+    </div>
+
+    <label>Atajos</label>
+    <div class="presets" id="presets">
+      <button type="button" data-m="GET" data-p="/api/lab/users/me">Mi perfil</button>
+      <button type="button" data-m="GET" data-p="/api/lab/accounts/5001">Mi cuenta</button>
+      <button type="button" data-m="GET" data-p="/api/lab/accounts/5001/transactions?limit=5">Movimientos</button>
+      <button type="button" data-m="PATCH" data-p="/api/lab/users/me" data-b='{"phone": "+34 600 000 000"}'>Editar perfil</button>
+      <button type="button" data-m="POST" data-p="/api/lab/transfers" data-b='{"fromAccountId": 5001, "toAccountId": 5002, "amount": 10}'>Transferir</button>
+      <button type="button" data-m="GET" data-p="/api/lab/admin/users">Panel admin</button>
+      <button type="button" data-m="GET" data-p="/api/lab/tools/preview?url=https://cdn.vulnbank.example/logo.png">Vista previa URL</button>
+      <button type="button" data-m="POST" data-p="/api/lab/auth/login" data-b='{"username": "laura", "password": "Laura2026!"}'>Login (manual)</button>
+    </div>
+
+    <label for="response">Respuesta</label>
+    <pre id="response" class="response">(aún no hay respuesta)</pre>
+  </div>
+</section>
+
+<!-- ENDPOINTS -->
+<section class="section section-alt" id="endpoints">
+  <h2 class="section-title">End<span>points</span></h2>
+  <p class="section-sub">Documentación pública de la API (la que vería cualquier cliente).</p>
+  <div class="card card-narrow">
+    <table class="endpoints">
+      <thead><tr><th>Método</th><th>Ruta</th><th>Descripción</th></tr></thead>
+      <tbody>
+        <tr><td>POST</td><td>/api/lab/auth/login</td><td>Login. Cuerpo: <code>{"username","password"}</code>. Devuelve un token.</td></tr>
+        <tr><td>GET</td><td>/api/lab/users/me</td><td>Perfil del usuario autenticado.</td></tr>
+        <tr><td>PATCH</td><td>/api/lab/users/me</td><td>Editar email y teléfono.</td></tr>
+        <tr><td>GET</td><td>/api/lab/accounts/{id}</td><td>Datos y saldo de una cuenta.</td></tr>
+        <tr><td>GET</td><td>/api/lab/accounts/{id}/transactions?limit=20</td><td>Movimientos de una cuenta.</td></tr>
+        <tr><td>POST</td><td>/api/lab/transfers</td><td>Transferencia: <code>{"fromAccountId","toAccountId","amount"}</code>.</td></tr>
+        <tr><td>GET</td><td>/api/lab/admin/users</td><td>Listado de usuarios (solo administradores).</td></tr>
+        <tr><td>GET</td><td>/api/lab/tools/preview?url=</td><td>Vista previa de un enlace.</td></tr>
+        <tr><td>POST</td><td>/api/lab/reset</td><td>Restaura los datos del laboratorio.</td></tr>
+        <tr><td>GET</td><td>/api/lab/version</td><td>Versión activa (vulnerable / endurecida).</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<footer>
+  <span class="brand">CYBER<span>SEC</span></span>
+  <small>© 2026 Ciberseguridad Empresarial · Lab de entrenamiento</small>
+</footer>
+
+<script src="/ciberseguridad/api-lab/api-lab.js"></script>
+</body>
+</html>

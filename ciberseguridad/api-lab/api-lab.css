@@ -1,0 +1,51 @@
+/* Laboratorio de seguridad en APIs: consola y tabla de endpoints */
+.api-status { margin-top: 14px; font-family: var(--font-mono); }
+.api-status .badge { margin: 0 0 0 6px; vertical-align: middle; }
+.mono { font-family: var(--font-mono); }
+.muted { color: var(--muted); }
+code { font-family: var(--font-mono); color: var(--green); }
+
+.console { max-width: 980px; margin: 0 auto; }
+.console label { display: block; margin: 16px 0 6px; font-family: var(--font-mono); font-size: 13px; color: var(--cyan); text-transform: uppercase; letter-spacing: 1px; }
+.console input, .console select, .console textarea {
+  width: 100%; padding: 10px 12px;
+  font-family: var(--font-mono); font-size: 15px; color: var(--text);
+  background: #010305; border: 1px solid var(--line); border-radius: 4px;
+}
+.console input:focus, .console select:focus, .console textarea:focus { outline: none; border-color: var(--green); box-shadow: var(--glow-green); }
+.console textarea { resize: vertical; }
+.console-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; margin-top: 14px; }
+.field-method { flex: 0 0 130px; }
+.field-path { flex: 1 1 300px; }
+.btn-sm { padding: 8px 14px; font-size: 13px; }
+
+.presets { display: flex; flex-wrap: wrap; gap: 8px; }
+.presets button {
+  padding: 6px 12px; cursor: pointer;
+  font-family: var(--font-mono); font-size: 13px; color: var(--green);
+  background: rgba(0, 255, 156, .06); border: 1px solid var(--line); border-radius: 3px;
+}
+.presets button:hover { border-color: var(--green); }
+
+.response {
+  min-height: 160px; max-height: 520px; overflow: auto; padding: 16px;
+  font-family: var(--font-mono); font-size: 14px; color: var(--green);
+  white-space: pre-wrap; word-break: break-word;
+  background: #010305; border: 1px solid var(--line); border-radius: 4px;
+}
+
+.endpoints { width: 100%; border-collapse: collapse; font-size: 15px; }
+.endpoints th, .endpoints td { padding: 10px 8px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: top; }
+.endpoints th { font-family: var(--font-mono); color: var(--cyan); font-weight: normal; }
+.endpoints td:first-child { font-family: var(--font-mono); color: var(--green); }
+.endpoints td:nth-child(2) { font-family: var(--font-mono); word-break: break-all; }
+
+@media (max-width: 700px) {
+  .field-method { flex: 1 1 100%; }
+  .endpoints { font-size: 14px; }
+  .endpoints thead { display: none; }
+  .endpoints tr, .endpoints td { display: block; }
+  .endpoints tr { padding: 8px 0; border-bottom: 1px solid var(--line); }
+  .endpoints td { padding: 2px 0; border: 0; }
+  .endpoints code { word-break: break-word; }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "vulnbank-api-lab",
+  "version": "1.0.0",
+  "private": true,
+  "description": "API del laboratorio de seguridad en APIs (Azure Functions). La version activa se cambia con tools/switch-api-lab.sh",
+  "engines": {
+    "node": ">=18"
+  }
+}
