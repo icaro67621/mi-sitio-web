@@ -8,6 +8,7 @@ La sección `/ciberseguridad` tiene laboratorios de seguridad con dos versiones.
 - API real (Azure Functions) en `api/lab/index.js`, servida en `/api/lab/...`.
 - Fuentes de cada versión: `labs/api-lab/vuln/index.js` y `labs/api-lab/clean/index.js`.
 - Manual: `labs/api-lab/MANUAL.md` (y su PDF `labs/api-lab/Manual-Lab-API.pdf`).
+- Manual de uso de la API endurecida con curl en Mac: `labs/api-lab/MANUAL-API-ENDURECIDA-MAC.md` (+ PDF).
 
 Cuando el usuario diga **"coloca el laboratorio de API vulnerable"** (o similar):
 
