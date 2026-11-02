@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Lab 01 · Modelado de Amenazas con STRIDE</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/ciberseguridad/stride/stride.css" />
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <a class="back" href="/ciberseguridad/#laboratorios">← Laboratorios</a>
+    <span class="badge">THREAT MODELING</span><span class="badge blue">LAB 01</span>
+    <h1>Modelado de Amenazas con STRIDE</h1>
+    <p class="sub">Kora te acompaña paso a paso: describes tu sistema, lo recorres con las seis categorías de STRIDE y terminas con una lista de amenazas y mitigaciones lista para compartir.</p>
+  </header>
+
+  <div class="grid">
+    <aside class="avatar-col hud" aria-label="Avatar guía">
+      <div class="avatar-head">
+        <svg class="avatar-svg" id="avatar" viewBox="0 0 100 100" aria-hidden="true">
+          <defs>
+            <linearGradient id="vg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0d2e38"/><stop offset="1" stop-color="#051419"/></linearGradient>
+          </defs>
+          <line x1="50" y1="6" x2="50" y2="16" stroke="#22c59a" stroke-width="2"/>
+          <circle cx="50" cy="5" r="3" fill="#22c59a"/>
+          <polygon points="50,14 86,30 86,72 50,92 14,72 14,30" fill="#06131a" stroke="#14b8c4" stroke-width="2"/>
+          <rect x="24" y="36" width="52" height="24" rx="6" fill="url(#vg)" stroke="#1d5a66"/>
+          <rect class="eye" x="33" y="43" width="10" height="10" rx="2" fill="#14b8c4"/>
+          <rect class="eye" x="57" y="43" width="10" height="10" rx="2" fill="#14b8c4"/>
+          <rect id="mouth" x="40" y="65" width="20" height="3" rx="1.5" fill="#22c59a"/>
+          <path d="M14 44 L6 44 L6 58 L14 58" fill="none" stroke="#1d5a66" stroke-width="2"/>
+          <path d="M86 44 L94 44 L94 58 L86 58" fill="none" stroke="#1d5a66" stroke-width="2"/>
+        </svg>
+        <div>
+          <p class="avatar-name">KORA</p>
+          <div class="avatar-role">GUÍA DE THREAT MODELING</div>
+          <div class="status"><i></i>en línea</div>
+        </div>
+      </div>
+      <div class="bubble" id="bubble" aria-live="polite"></div>
+      <div class="ask-label">Pregúntale a Kora</div>
+      <div class="chips" id="faq"></div>
+    </aside>
+
+    <main class="stack">
+      <nav class="steps" role="tablist" id="steps"></nav>
+      <section class="hud" id="view"></section>
+    </main>
+  </div>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script src="/ciberseguridad/stride/stride.js"></script>
+</body>
+</html>
