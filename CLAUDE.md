@@ -36,3 +36,13 @@ el manual y regenerar el PDF.
 ## Lab 03 · Remediación (VulnBank web)
 
 `bash tools/switch-lab.sh vuln|clean` (ramas base `lab-vuln-baseline` / `lab-clean-baseline`).
+
+## Lab 01 · Modelado de Amenazas (STRIDE)
+
+- Página: `ciberseguridad/stride/` (HTML + `stride.css` + `stride.js`, sin inline por la CSP).
+- Pestaña "Tu proyecto con IA": llama a `api/stride/index.js` (`POST /api/stride`), que usa
+  el skill `api/stride/skill.md` como system prompt y el SDK `@anthropic-ai/sdk`.
+  Va por fases (contexto → 6 categorías en paralelo → plan) para respetar el límite de 45 s
+  de las funciones de Static Web Apps.
+- Variables de entorno en Azure: `ANTHROPIC_API_KEY` y `STRIDE_ACCESS_CODE` (obligatorias);
+  `STRIDE_MODEL` y `STRIDE_MAX_PER_HOUR` (opcionales). Sin las obligatorias responde 503.
