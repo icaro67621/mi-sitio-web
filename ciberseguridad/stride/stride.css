@@ -178,30 +178,3 @@ th{font-family:var(--f-mono);font-size:11.5px;color:var(--muted);letter-spacing:
 .md-out{min-height:160px;font-family:var(--f-mono);font-size:13px}
 .back{font-family:var(--f-mono);font-size:13px;color:var(--muted);text-decoration:none;flex-basis:100%}
 .back:hover{color:var(--teal)}
-.step.ai{border-color:var(--green);color:var(--green)}
-.step.ai .n{color:var(--green)}
-.step.ai[aria-selected="true"]{background:rgba(34,197,154,.08)}
-.warn{margin:0;border-left:3px solid var(--amber);background:rgba(224,164,58,.08);padding:8px 12px;font-size:15px;color:#e9cf9f;border-radius:0 6px 6px 0}
-.progress-box{background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
-.pchips{display:flex;flex-wrap:wrap;gap:6px}
-.pchip{display:inline-flex;flex-direction:column;border:1px solid var(--line-hi);border-radius:6px;padding:4px 10px;font-size:14px;line-height:1.25}
-.pchip small{font-family:var(--f-mono);font-size:10.5px;color:var(--muted)}
-.pchip.run{border-color:var(--teal)}.pchip.run small{color:var(--teal)}
-.pchip.ok{border-color:var(--green)}.pchip.ok small{color:var(--green)}
-.pchip.err{border-color:var(--red)}.pchip.err small{color:#f08aa0}
-.pchip.run small::after{content:"";display:inline-block;width:6px;height:6px;margin-left:6px;border-radius:50%;background:var(--teal);animation:blink 1s steps(2) infinite}
-.qbox{border:1px solid var(--amber);border-radius:10px;padding:14px 16px;background:rgba(224,164,58,.06)}
-.qbox ol{margin:6px 0 12px;padding-left:20px}
-.errbox{border:1px solid #5a2030;border-radius:8px;padding:10px 12px;color:#f08aa0;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-.report details{border:1px solid var(--line);border-radius:10px;padding:10px 14px;background:var(--panel-2)}
-.report summary{cursor:pointer;list-style:none}
-.report summary::-webkit-details-marker{display:none}
-.report summary h3{display:inline}
-.report summary::before{content:"▸ ";color:var(--teal)}
-.report details[open] summary::before{content:"▾ "}
-.decomp{display:flex;flex-direction:column;gap:12px;margin-top:10px}
-.decomp p{margin:0}
-ul.clean{margin:4px 0 0;padding-left:18px}
-ul.clean li{margin-bottom:3px}
-table.tm td{min-width:90px}
-table.tm td:nth-child(4),table.tm td:nth-child(8){min-width:220px}

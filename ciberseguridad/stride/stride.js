@@ -49,8 +49,7 @@ const STEP_SAY = [
   'Primero responde: <b>¿qué estamos construyendo?</b> Lista los elementos de tu sistema como en un diagrama de flujo de datos: entidades externas, procesos, almacenes y flujos. Te cargué un <b>ejemplo</b> de una app de transferencias; puedes editarlo o empezar de cero.',
   null,
   'Este es tu plan. La matriz te muestra qué combinaciones elemento × categoría aplican y cuáles <b>todavía no revisaste</b> (casillas punteadas). Una casilla vacía no siempre es un error, pero sí una pregunta que conviene hacerse.',
-  'Modo práctica. Te muestro un escenario y tú eliges la categoría STRIDE. Algunos casos tocan más de una; elige la <b>principal</b> y te explico por qué.',
-  'Aquí analizo <b>tu proyecto real</b> con IA. Cuéntame qué estás construyendo, sus componentes y flujos, y qué datos son sensibles. Mientras más concreto seas, más útil será el modelo. Te dejé un <b>ejemplo</b> para que veas el nivel de detalle.'
+  'Modo práctica. Te muestro un escenario y tú eliges la categoría STRIDE. Algunos casos tocan más de una; elige la <b>principal</b> y te explico por qué.'
 ];
 const QUIZ = [
   ['Un atacante reutiliza un token de sesión robado para entrar a la cuenta de otra persona.','S','Usa una identidad que no es suya: es suplantación. La mitigación típica es atar la sesión al dispositivo, expirarla rápido y pedir MFA en acciones sensibles.'],
@@ -113,9 +112,9 @@ $('#faq').innerHTML = FAQ.map((f,i)=>`<button class="chip" data-faq="${i}">${f[0
 $('#faq').addEventListener('click',e=>{ const b=e.target.closest('[data-faq]'); if(b) say(FAQ[b.dataset.faq][1]); });
 
 /* ---- Steps ---- */
-const STEPS = [['1','Conoce STRIDE'],['2','Describe tu sistema'],['3','Analiza'],['4','Plan de mitigación'],['','Práctica'],['','Tu proyecto con IA']];
+const STEPS = [['1','Conoce STRIDE'],['2','Describe tu sistema'],['3','Analiza'],['4','Plan de mitigación'],['','Práctica']];
 function renderSteps(){
-  $('#steps').innerHTML = STEPS.map((s,i)=>`<button role="tab" class="step${i===4?' practice':''}${i===5?' ai':''}" aria-selected="${S.step===i}" data-step="${i}">${s[0]?`<span class="n">0${s[0]}</span>`:`<span class="n">${i===5?'◆':'◇'}</span>`}${s[1]}</button>`).join('');
+  $('#steps').innerHTML = STEPS.map((s,i)=>`<button role="tab" class="step${i===4?' practice':''}" aria-selected="${S.step===i}" data-step="${i}">${s[0]?`<span class="n">0${s[0]}</span>`:'<span class="n">◇</span>'}${s[1]}</button>`).join('');
 }
 $('#steps').addEventListener('click',e=>{ const b=e.target.closest('[data-step]'); if(b) go(+b.dataset.step); });
 function go(i,quiet){ S.step=i; save(); renderSteps(); render(); if(!quiet) say(i===2?catSay():STEP_SAY[i]); window.scrollTo({top:0,behavior:reduce?'auto':'smooth'}); }
@@ -123,7 +122,7 @@ const catOf = k=>STRIDE.find(c=>c.k===k);
 const catSay = ()=>catOf(S.cat).say;
 const compName = id=>(S.components.find(c=>c.id===id)||{name:'(elemento eliminado)'}).name;
 
-function render(){ [vIntro,vSystem,vAnalyze,vPlan,vQuiz,vAI][S.step||0](); }
+function render(){ [vIntro,vSystem,vAnalyze,vPlan,vQuiz][S.step](); }
 
 /* 1. Intro */
 function vIntro(){
@@ -323,225 +322,4 @@ $('#view').addEventListener('click',e=>{
   else if(t.dataset.ans) answer(t.dataset.ans);
 });
 
-/* ================= Tu proyecto con IA ================= */
-const AI_FIELDS = [
-  ['nombre','NOMBRE DEL PROYECTO','input','Ej.: App de reservas del gimnasio'],
-  ['descripcion','¿QUÉ SE ESTÁ CONSTRUYENDO?','textarea','Qué hace, para quién y cuáles son sus funciones principales.'],
-  ['componentes','COMPONENTES, ACTORES Y FLUJOS DE DATOS','textarea','Una línea por elemento o flujo. Ej.: Usuario → Frontend React → API Node → PostgreSQL. Indica dónde cambia el nivel de confianza.'],
-  ['activos','ACTIVOS CRÍTICOS','textarea','Datos o funciones sensibles: datos personales, pagos, credenciales, lógica de negocio.'],
-  ['superficie','SUPERFICIE DE ATAQUE','textarea','Entradas externas: APIs, formularios, webhooks, subida de archivos, integraciones, LLMs.'],
-  ['despliegue','CONTEXTO DE DESPLIEGUE','textarea','Cloud u on-prem, cómo se autentican usuarios y servicios, si hay componentes de IA.']
-];
-function aiDefault(){
-  return { codigo:'', ejemplo:true, proyecto:{
-    nombre:'Plataforma de tutorías con asistente IA (ejemplo)',
-    descripcion:'Plataforma web donde estudiantes agendan tutorías con docentes, suben sus tareas en PDF y conversan con un asistente de IA que responde dudas usando el material del curso. Los docentes califican las tareas y ven el historial de cada estudiante.',
-    componentes:'Estudiante y Docente (navegador) → Frontend web (React) → API backend (Node.js en Azure App Service)\nAPI → Base de datos PostgreSQL (usuarios, tutorías, calificaciones)\nAPI → Almacenamiento de archivos (Azure Blob) para los PDF de tareas\nAPI → Asistente IA (LLM externo) con acceso de lectura al material del curso y a las tareas del estudiante\nAPI → Servicio de correo para notificaciones\nLímites de confianza: Internet ↔ API; API ↔ red interna (BD y Blob); API ↔ proveedor LLM',
-    activos:'Datos personales de estudiantes, calificaciones, tareas entregadas, credenciales de acceso, material del curso.',
-    superficie:'Login con correo y contraseña, API REST pública, subida de PDF, chat con el asistente IA, enlaces en correos de notificación.',
-    despliegue:'Azure (App Service, PostgreSQL administrado, Blob Storage). Autenticación con JWT emitido por la propia API. El LLM es un servicio externo llamado con una API key guardada en variables de entorno.',
-    respuestas:''
-  }, res:null };
-}
-const RISK_ORDER = {Alto:0,Medio:1,Bajo:2};
-let aiBusy=false;
-
-async function aiCall(body){
-  const r = await fetch('/api/stride',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({codigo:S.ai.codigo,proyecto:S.ai.proyecto,...body})});
-  let j={}; try{ j=await r.json(); }catch(e){}
-  if(!r.ok) throw new Error(j.error||`Error ${r.status} al contactar el servidor.`);
-  return j.datos;
-}
-
-function vAI(){
-  const A=S.ai, R=A.res;
-  $('#view').innerHTML = `
-  <div class="stack">
-    <div><div class="kicker">Análisis asistido · STRIDE</div><h2>Modela las amenazas de tu proyecto</h2>
-    <p class="lead flush">Describe tu aplicación o proyecto y Kora hará un modelo de amenazas completo: descomposición del sistema, STRIDE por elemento, priorización, mitigaciones y supuestos.</p></div>
-    <p class="warn">No pegues contraseñas, claves de API ni datos reales de personas. El texto se envía a un servicio de IA externo para ser analizado.</p>
-    <form id="ai-form" class="stack tform">
-      ${AI_FIELDS.map(([k,l,t,ph])=>`<label class="f">${l}${t==='input'
-        ?`<input id="ai-${k}" data-aif="${k}" value="${esc(A.proyecto[k])}" placeholder="${esc(ph)}">`
-        :`<textarea id="ai-${k}" data-aif="${k}" placeholder="${esc(ph)}" rows="${k==='componentes'?6:3}">${esc(A.proyecto[k])}</textarea>`}</label>`).join('')}
-      ${A.proyecto.respuestas||(R&&R.contexto&&!R.contexto.suficiente)?`<label class="f">RESPUESTAS A LAS PREGUNTAS DE KORA<textarea id="ai-respuestas" data-aif="respuestas" rows="4" placeholder="Responde las preguntas críticas que aparecen más abajo.">${esc(A.proyecto.respuestas)}</textarea></label>`:''}
-      <div class="row2 end">
-        <label class="f">CÓDIGO DE ACCESO<input id="ai-codigo" type="password" autocomplete="off" value="${esc(A.codigo)}" placeholder="Te lo da el docente"></label>
-        <div class="actions"><button class="btn" type="submit" id="ai-go" ${aiBusy?'disabled':''}>${aiBusy?'Analizando…':'Analizar con Kora'}</button>
-        ${A.ejemplo?'<button type="button" class="btn ghost" id="ai-clear">Borrar ejemplo</button>':''}</div>
-      </div>
-    </form>
-    <div id="ai-progress"></div>
-    <div id="ai-report"></div>
-  </div>`;
-  $('#ai-form').addEventListener('input',e=>{ const k=e.target.dataset.aif; if(k){ A.proyecto[k]=e.target.value; A.ejemplo=false; save(); } else if(e.target.id==='ai-codigo'){ A.codigo=e.target.value; save(); } });
-  $('#ai-form').onsubmit=e=>{ e.preventDefault(); aiRun(false); };
-  if(A.ejemplo) $('#ai-clear').onclick=()=>{ for(const k in A.proyecto) A.proyecto[k]=''; A.ejemplo=false; A.res=null; save(); vAI(); say('Listo. Empieza por <b>qué hace tu sistema</b> y luego lista sus piezas y cómo viajan los datos entre ellas.'); };
-  if(R) renderAIReport();
-}
-
-function progressHTML(st){
-  const chip=(label,s)=>`<span class="pchip ${s}">${label}<small>${{wait:'en espera',run:'analizando…',ok:'listo',err:'error'}[s]}</small></span>`;
-  return `<div class="progress-box"><div class="kicker">Progreso del análisis</div><div class="pchips">
-    ${chip('Contexto',st.contexto)}${STRIDE.map(c=>chip(c.k+' · '+c.es,st[c.k])).join('')}${chip('Plan',st.plan)}</div></div>`;
-}
-
-async function aiRun(skipQuestions){
-  const A=S.ai;
-  if(aiBusy) return;
-  if(!A.codigo.trim()){ say('Necesito el <b>código de acceso</b> que te dio el docente para usar el análisis con IA.'); $('#ai-codigo').focus(); return; }
-  if((A.proyecto.descripcion||'').trim().length<40){ say('Cuéntame un poco más sobre <b>qué se está construyendo</b>. Con un par de frases ya puedo empezar.'); $('#ai-descripcion').focus(); return; }
-  aiBusy=true; const st={contexto:'run',plan:'wait'}; STRIDE.forEach(c=>st[c.k]='wait');
-  const paint=()=>{ const p=$('#ai-progress'); if(p) p.innerHTML=progressHTML(st); const b=$('#ai-go'); if(b){b.disabled=true;b.textContent='Analizando…';} };
-  const prev=A.res;
-  A.res={contexto:prev&&skipQuestions?prev.contexto:null,amenazas:{},errores:{},plan:null}; $('#ai-report').innerHTML=''; paint();
-  try{
-    if(!(skipQuestions&&A.res.contexto)){
-      say('Primero reviso si tengo el <b>contexto</b> suficiente y descompongo tu sistema en actores, procesos, almacenes y flujos…');
-      A.res.contexto=await aiCall({fase:'contexto'});
-    }
-    st.contexto='ok'; save(); paint();
-    const ctx=A.res.contexto;
-    if(!ctx.suficiente && !skipQuestions){
-      aiBusy=false; save(); vAI();
-      say('Antes de seguir necesito algunos datos. Respóndelos en el campo <b>Respuestas</b> y vuelve a analizar, o continúa y los trataré como <b>supuestos</b>.');
-      return;
-    }
-    say('Ahora recorro tu sistema con las <b>seis categorías de STRIDE</b> en paralelo. Esto toma alrededor de un minuto.');
-    STRIDE.forEach(c=>st[c.k]='run'); paint();
-    await Promise.all(STRIDE.map(c=>aiCall({fase:'amenazas',categoria:c.k,contexto:ctx})
-      .then(d=>{A.res.amenazas[c.k]=d; st[c.k]='ok';})
-      .catch(e=>{A.res.errores[c.k]=e.message; st[c.k]='err';})
-      .finally(paint)));
-    numberThreats();
-    const list=allThreats();
-    if(!list.length) throw new Error(Object.values(A.res.errores)[0]||'No se identificaron amenazas.');
-    st.plan='run'; paint(); say('Último paso: <b>priorizo</b> las amenazas y propongo controles concretos…');
-    try{ A.res.plan=await aiCall({fase:'plan',contexto:ctx,amenazas:list.map(t=>({id:t.id,categoria:t.cat,componente:t.componente,descripcion:t.descripcion,riesgo:t.riesgo,mitigacion:t.mitigacion}))}); st.plan='ok'; }
-    catch(e){ A.res.errores.plan=e.message; st.plan='err'; }
-    const nAlto=list.filter(t=>t.riesgo==='Alto').length, fails=Object.keys(A.res.errores).length;
-    say(`Listo: encontré <b>${list.length} amenazas</b>, ${nAlto} de riesgo alto.${fails?` Hubo ${fails} parte(s) con error; puedes reintentarlas abajo.`:''} Revisa primero las <b>bloqueantes</b>.`);
-  }catch(e){
-    say('No pude completar el análisis: <b>'+esc(e.message)+'</b>');
-    if(!A.res.contexto) A.res=prev;
-  }
-  aiBusy=false; save(); vAI();
-}
-function numberThreats(){
-  let n=0; const A=S.ai;
-  STRIDE.forEach(c=>{ const d=A.res.amenazas[c.k]; if(d) d.amenazas.forEach(t=>{ t.id='A'+String(++n).padStart(2,'0'); }); });
-}
-function allThreats(){
-  const out=[]; STRIDE.forEach(c=>{ const d=S.ai.res&&S.ai.res.amenazas[c.k]; if(d) d.amenazas.forEach(t=>out.push({...t,cat:c.k})); });
-  return out.sort((a,b)=>RISK_ORDER[a.riesgo]-RISK_ORDER[b.riesgo]||RISK_ORDER[a.impacto]-RISK_ORDER[b.impacto]);
-}
-async function aiRetry(k){
-  const A=S.ai; if(aiBusy) return; aiBusy=true;
-  say(k==='plan'?'Reintento la <b>priorización</b>…':`Reintento la categoría <b>${catOf(k).es}</b>…`);
-  try{
-    if(k==='plan'){ A.res.plan=await aiCall({fase:'plan',contexto:A.res.contexto,amenazas:allThreats().map(t=>({id:t.id,categoria:t.cat,componente:t.componente,descripcion:t.descripcion,riesgo:t.riesgo,mitigacion:t.mitigacion}))}); }
-    else { A.res.amenazas[k]=await aiCall({fase:'amenazas',categoria:k,contexto:A.res.contexto}); numberThreats(); }
-    delete A.res.errores[k]; say('Listo, ya está agregado al reporte.');
-  }catch(e){ say('Sigue fallando: <b>'+esc(e.message)+'</b>'); }
-  aiBusy=false; save(); vAI();
-}
-
-function renderAIReport(){
-  const R=S.ai.res, C=R.contexto; if(!C) return;
-  const list=allThreats(), P=R.plan, pri={}; (P?P.priorizacion:[]).forEach(p=>pri[p.id]=p);
-  const recs=P?P.recomendaciones:[];
-  const li=a=>a&&a.length?`<ul class="clean">${a.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:'<p class="note">Ninguno.</p>';
-  const els=(a)=>a.length?`<ul class="clean">${a.map(x=>`<li><b>${esc(x.nombre)}</b>: ${esc(x.descripcion)}</li>`).join('')}</ul>`:'<p class="note">Ninguno identificado.</p>';
-  const noap=[], insuf=[];
-  STRIDE.forEach(c=>{ const d=R.amenazas[c.k]; if(!d) return; d.no_aplica.forEach(x=>noap.push({cat:c.k,...x})); d.informacion_insuficiente.forEach(x=>insuf.push(`${c.k} · ${x}`)); });
-  const errs=Object.keys(R.errores||{});
-  $('#ai-report').innerHTML = `
-  <div class="stack report">
-    ${!C.suficiente&&!list.length?`<div class="qbox"><h3>Kora necesita más contexto</h3>
-      <ol>${C.preguntas_criticas.map(q=>`<li>${esc(q)}</li>`).join('')}</ol>
-      <div class="actions"><button class="btn" data-ai="answer">Responder las preguntas</button><button class="btn ghost" data-ai="skip">Continuar con supuestos</button></div></div>`:''}
-    ${errs.length?`<div class="errbox">Algunas partes fallaron: ${errs.map(k=>`<button class="chip" data-retry="${k}">Reintentar ${k==='plan'?'plan':k+' · '+catOf(k).es}</button>`).join(' ')}</div>`:''}
-    ${P?`<div><h2>Resumen ejecutivo</h2><p class="lead flush">${esc(P.resumen_ejecutivo)}</p></div>`:''}
-    ${list.length?`<div class="stats">
-      <div class="stat"><b>${list.length}</b>amenazas</div>
-      <div class="stat"><b class="c-alta">${list.filter(t=>t.riesgo==='Alto').length}</b>riesgo alto</div>
-      <div class="stat"><b class="c-media">${list.filter(t=>t.riesgo==='Medio').length}</b>medio</div>
-      <div class="stat"><b class="c-baja">${list.filter(t=>t.riesgo==='Bajo').length}</b>bajo</div>
-      ${P?`<div class="stat"><b class="c-alta">${P.priorizacion.filter(p=>p.bloqueante).length}</b>bloqueantes</div>`:''}
-    </div>`:''}
-    <details ${list.length?'':'open'}><summary><h3>Descomposición del sistema</h3></summary>
-      <div class="decomp">
-        <p>${esc(C.resumen)}</p>
-        <div class="row2">
-          <div><div class="kicker">Actores / entidades externas</div>${els(C.actores)}</div>
-          <div><div class="kicker">Procesos</div>${els(C.procesos)}</div>
-          <div><div class="kicker">Almacenes de datos</div>${els(C.almacenes)}</div>
-          <div><div class="kicker">Límites de confianza</div>${els(C.limites_confianza)}</div>
-        </div>
-        <div class="kicker">Flujos de datos</div>
-        <div class="scroll"><table><thead><tr><th>Origen</th><th>Destino</th><th>Datos</th><th>Cruza límite</th></tr></thead><tbody>
-        ${C.flujos.map(f=>`<tr><td>${esc(f.origen)}</td><td>${esc(f.destino)}</td><td>${esc(f.datos)}</td><td>${f.cruza_limite?esc(f.cruza_limite):'—'}</td></tr>`).join('')}</tbody></table></div>
-        <div class="row2"><div><div class="kicker">Activos críticos</div>${li(C.activos_criticos)}</div><div><div class="kicker">Superficie de ataque</div>${li(C.superficie_ataque)}</div></div>
-        ${C.suficiente&&C.preguntas_criticas.length?`<div class="kicker">Preguntas que conviene responder</div>${li(C.preguntas_criticas)}`:''}
-      </div></details>
-    ${list.length?`<div><h3>Tabla de amenazas</h3><p class="note below">Ordenada por riesgo (impacto × probabilidad).</p>
-      <div class="scroll"><table class="tm"><thead><tr><th>ID</th><th>Componente</th><th>STRIDE</th><th>Amenaza</th><th>Impacto</th><th>Prob.</th><th>Riesgo</th><th>Mitigación propuesta</th></tr></thead><tbody>
-      ${list.map(t=>`<tr><td class="mono">${t.id}${pri[t.id]&&pri[t.id].bloqueante?'<br><span class="pill Alta">bloqueante</span>':''}</td><td>${esc(t.componente)}</td><td class="mono" title="${catOf(t.cat).es}">${t.cat}</td><td>${esc(t.descripcion)}</td><td>${t.impacto}</td><td>${t.probabilidad}</td><td><span class="pill ${sevOf(t.riesgo)}">${t.riesgo}</span></td><td>${esc(t.mitigacion)}</td></tr>`).join('')}
-      </tbody></table></div></div>`:''}
-    ${P?`<div><h3>Priorización</h3><div class="scroll"><table><thead><tr><th>ID</th><th>Estado</th><th>Razón</th></tr></thead><tbody>
-      ${P.priorizacion.map(p=>`<tr><td class="mono">${esc(p.id)}</td><td>${p.bloqueante?'<span class="pill Alta">Bloqueante</span>':'<span class="pill Baja">Con seguimiento</span>'}</td><td>${esc(p.razon)}</td></tr>`).join('')}</tbody></table></div></div>
-      <div><h3>Recomendaciones de mitigación</h3><div class="scroll"><table><thead><tr><th>ID</th><th>Tipo</th><th>Control</th></tr></thead><tbody>
-      ${recs.map(r=>`<tr><td class="mono">${esc(r.id)}</td><td><span class="tag">${r.tipo}</span></td><td>${esc(r.control)}</td></tr>`).join('')}</tbody></table></div></div>`:''}
-    ${noap.length?`<details><summary><h3>Categorías que no aplican (${noap.length})</h3></summary><div class="scroll"><table><thead><tr><th>STRIDE</th><th>Componente</th><th>Justificación</th></tr></thead><tbody>
-      ${noap.map(x=>`<tr><td class="mono">${x.cat}</td><td>${esc(x.componente)}</td><td>${esc(x.justificacion)}</td></tr>`).join('')}</tbody></table></div></details>`:''}
-    ${insuf.length?`<div><h3>Información insuficiente</h3>${li(insuf)}</div>`:''}
-    ${P?`<div><h3>Supuestos asumidos</h3>${li(P.supuestos)}</div>`:''}
-    ${list.length?`<div class="actions"><button class="btn" data-ai="md">Copiar como Markdown</button><button class="btn ghost" data-ai="import">Llevar a mi modelo (pasos 2 a 4)</button></div>
-      <textarea id="ai-md" class="md-out" hidden readonly></textarea>`:''}
-  </div>`;
-}
-const sevOf=r=>({Alto:'Alta',Medio:'Media',Bajo:'Baja'})[r];
-
-function aiMarkdown(){
-  const A=S.ai, R=A.res, C=R.contexto, P=R.plan, list=allThreats(), pri={}; (P?P.priorizacion:[]).forEach(p=>pri[p.id]=p);
-  const cell=s=>String(s??'').replace(/\|/g,'/').replace(/\n/g,' ');
-  const L=[`# Modelo de amenazas STRIDE: ${A.proyecto.nombre||'Mi proyecto'}`,''];
-  if(P) L.push('## Resumen ejecutivo','',P.resumen_ejecutivo,'');
-  L.push('## Descomposición del sistema','',C.resumen,'');
-  [['Actores',C.actores],['Procesos',C.procesos],['Almacenes de datos',C.almacenes],['Límites de confianza',C.limites_confianza]].forEach(([t,a])=>{ L.push(`### ${t}`,...a.map(x=>`- **${x.nombre}**: ${x.descripcion}`),''); });
-  L.push('### Flujos de datos','','| Origen | Destino | Datos | Cruza límite |','|---|---|---|---|',...C.flujos.map(f=>`| ${cell(f.origen)} | ${cell(f.destino)} | ${cell(f.datos)} | ${cell(f.cruza_limite)||'—'} |`),'');
-  L.push('## Tabla de amenazas','','| ID | Componente | Categoría STRIDE | Descripción de la amenaza | Impacto | Probabilidad | Riesgo | Mitigación propuesta |','|---|---|---|---|---|---|---|---|',
-    ...list.map(t=>`| ${t.id}${pri[t.id]&&pri[t.id].bloqueante?' (bloqueante)':''} | ${cell(t.componente)} | ${t.cat} – ${catOf(t.cat).en} | ${cell(t.descripcion)} | ${t.impacto} | ${t.probabilidad} | ${t.riesgo} | ${cell(t.mitigacion)} |`),'');
-  if(P){
-    L.push('## Priorización','',...P.priorizacion.map(p=>`- **${p.id}** · ${p.bloqueante?'Bloqueante para producción':'Aceptable con seguimiento'}: ${p.razon}`),'');
-    L.push('## Recomendaciones de mitigación','','| ID | Tipo | Control |','|---|---|---|',...P.recomendaciones.map(r=>`| ${r.id} | ${r.tipo} | ${cell(r.control)} |`),'');
-    L.push('## Supuestos asumidos','',...P.supuestos.map(s=>`- ${s}`),'');
-  }
-  return L.join('\n');
-}
-function aiImport(){
-  const R=S.ai.res, C=R.contexto, comps=[], byName={};
-  const add=(name,type)=>{ const id=uid(); comps.push({id,name,type}); byName[name.toLowerCase()]=id; };
-  C.actores.forEach(x=>add(x.nombre,'ext')); C.procesos.forEach(x=>add(x.nombre,'proc')); C.almacenes.forEach(x=>add(x.nombre,'store'));
-  C.flujos.forEach(f=>add(`${f.origen} → ${f.destino}`,'flow'));
-  const threats=allThreats().map(t=>{ let id=byName[t.componente.toLowerCase()];
-    if(!id){ add(t.componente,'proc'); id=byName[t.componente.toLowerCase()]; }
-    return {id:uid(),cat:t.cat,comp:id,sev:sevOf(t.riesgo),desc:`[${t.id}] ${t.descripcion}`,mit:t.mitigacion}; });
-  Object.assign(S,{name:S.ai.proyecto.nombre||'Mi proyecto',boundaries:C.limites_confianza.map(b=>b.nombre).join(' · '),components:comps,threats});
-  save(); go(3,true);
-  say('Pasé tu modelo a los pasos 2 a 4. Ahora puedes <b>editar, borrar o agregar</b> amenazas a mano y revisar la matriz para encontrar huecos.');
-}
-$('#view').addEventListener('click',e=>{
-  const b=e.target.closest('button'); if(!b||S.step!==5) return;
-  if(b.dataset.retry) aiRetry(b.dataset.retry);
-  const a=b.dataset.ai; if(!a) return;
-  if(a==='skip') aiRun(true);
-  else if(a==='answer'){ if(!S.ai.proyecto.respuestas) S.ai.proyecto.respuestas=S.ai.res.contexto.preguntas_criticas.map((q,i)=>`${i+1}. ${q}\n→ `).join('\n'); save(); vAI(); const t=$('#ai-respuestas'); if(t){ t.focus(); t.scrollIntoView({block:'center'}); } }
-  else if(a==='md'){ const md=aiMarkdown(), ta=$('#ai-md'); ta.value=md;
-    const fb=()=>{ ta.hidden=false; ta.select(); toast('Selecciona y copia el texto'); };
-    if(navigator.clipboard) navigator.clipboard.writeText(md).then(()=>toast('Markdown copiado')).catch(fb); else fb(); }
-  else if(a==='import') aiImport();
-});
-
-if(!S.ai) S.ai=aiDefault(); if(S.step>5) S.step=0;
 renderSteps(); render(); say(S.step===2?catSay():STEP_SAY[S.step]);
