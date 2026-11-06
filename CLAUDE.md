@@ -51,3 +51,8 @@ ACTIVACIÓN DE ESCENARIO (la entrega el gestor del sistema). Aún no hay llaves 
 registrada abre el aviso "Los Tokens cuestan" (Kora holograma rojo, `#tokens-dlg`). La activación
 y el resto de módulos en ese modo quedan para un desarrollo posterior (el código sigue en `tm.js`,
 bloqueado en `renderTop`/`go`).
+
+## Charla · Arquitectura de Ciberseguridad
+
+Página `/ciberseguridad/arquitectura/` (tarjeta en la sección Charlas). Por ahora es solo el
+espacio vacío ("en construcción"); el contenido de la demo se definirá después.
