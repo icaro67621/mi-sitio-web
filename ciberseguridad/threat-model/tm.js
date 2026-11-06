@@ -116,8 +116,7 @@ const FAQ = [
   ['¿Por qué justificar lo que no aplica?', 'El skill lo exige: <b>no se omiten categorías</b>. Una casilla vacía puede ser un olvido; una casilla justificada es una decisión que el equipo puede revisar.'],
   ['¿Cómo se calcula el riesgo?', '<b>Impacto × probabilidad</b> en una matriz 3×3. Alto×Alta, Alto×Media y Medio×Alta dan riesgo Alto; los demás bajan a Medio o Bajo.'],
   ['¿Qué es “bloqueante”?', 'Una amenaza que <b>impide salir a producción</b> hasta tener su control. Por defecto son las de riesgo Alto; el resto entra al backlog con seguimiento.'],
-  ['¿Cómo usa el equipo los specs?', 'Cada spec trae requisitos con <b>DEBE</b>, criterios de aceptación <b>Dado / Cuando / Entonces</b> y cómo verificarlo. Se copian a la historia de usuario y QA los convierte en pruebas.'],
-  ['¿Hay IA en vivo?', 'No. Para que la sesión sea controlada y repetible, en BOT Act la historia y su modelo están preparados con el skill, y en HISTORIA REAL te sugiero amenazas con reglas del catálogo según lo que escribes.']
+  ['¿Cómo usa el equipo los specs?', 'Cada spec trae requisitos con <b>DEBE</b>, criterios de aceptación <b>Dado / Cuando / Entonces</b> y cómo verificarlo. Se copian a la historia de usuario y QA los convierte en pruebas.']
 ];
 
 const STEPS = ['Historia','Contexto','Descomposición','STRIDE por elemento','Amenazas y prioridad','Specs del equipo'];
@@ -643,6 +642,7 @@ function vSpecs(){
       </article>`; }).join('')}</div>
     <div><h3>Supuestos que el equipo debe validar</h3><ul class="bounds">${allAssumptions(m).map(a => `<li>${esc(a)}</li>`).join('')}</ul></div>
     <div class="actions nav-row"><button class="btn ghost" data-go="4">← Volver a la tabla</button>${isDemo() ? '<button class="btn" id="to-real">Ahora con mi historia real →</button>' : ''}</div>
+    <div class="reset-all" id="reset-all-zone"><button class="btn danger big" id="reset-all">⟲ Reiniciar todo el entorno</button><span class="note">Vuelve al inicio: borra la sesión de BOT Act y lo escrito en HISTORIA REAL.</span></div>
   </div>`;
   const md = () => specsMarkdown(m, specs);
   $('#copy-md').onclick = () => {
@@ -657,6 +657,19 @@ function vSpecs(){
     document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   };
   const tr = $('#to-real'); if(tr) tr.onclick = () => setMode('real');
+  $('#reset-all').onclick = () => {
+    $('#reset-all-zone').innerHTML = `<span class="confirm">¿Reiniciar todo el entorno? <button class="btn danger" id="ra-yes">Sí, reiniciar</button><button class="btn ghost" id="ra-no">Cancelar</button></span>`;
+    $('#ra-no').onclick = vSpecs;
+    $('#ra-yes').onclick = resetAll;
+  };
+}
+
+function resetAll(){
+  try{ localStorage.removeItem(KEY); }catch(e){}
+  APP = load(); APP.mode = 'demo'; openForm = null; save();
+  renderTop(); render(); say(SAY.demo[0]);
+  window.scrollTo({top: 0, behavior: reduce ? 'auto' : 'smooth'});
+  toast('Entorno reiniciado');
 }
 
 /* ---------- Ver skill ---------- */

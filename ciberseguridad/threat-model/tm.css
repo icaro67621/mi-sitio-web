@@ -202,3 +202,5 @@ select.mini{padding:3px 6px;font-size:14px;width:auto}
 .hs-cap{position:relative;text-align:center;margin:4px 0 0;color:var(--muted)}
 .hs-cap b{color:#7ff3ff;font-family:var(--f-display);letter-spacing:.15em}
 @media (max-width:880px){.holo{height:180px}}
+.reset-all{display:flex;flex-direction:column;align-items:center;gap:8px;padding:18px;border:1px dashed #5a2030;border-radius:12px;text-align:center}
+.btn.danger.big{font-size:16px;padding:12px 24px}
