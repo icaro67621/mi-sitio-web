@@ -198,8 +198,8 @@ function vStory(){
       <div class="key-ico" aria-hidden="true">🔑</div>
       <div class="key-txt"><div class="kicker">Módulo en modo restringido</div>
         <p>Para poder usar este módulo en producción debe tener una <b>LLAVE DE ACTIVACIÓN DE ESCENARIO</b>, entregada por el <b>gestor del sistema</b>.</p>
-        <div class="key-row"><input id="scn-key" placeholder="LLAVE DE ACTIVACIÓN DE ESCENARIO" disabled aria-label="Llave de activación de escenario"><button class="btn" disabled>Activar escenario</button></div>
-        <p class="note">Activación disponible en un próximo desarrollo. Por ahora solo está habilitado <b>Contar historia</b>.</p></div>
+        <form class="key-row" id="key-form"><input id="scn-key" placeholder="LLAVE DE ACTIVACIÓN DE ESCENARIO" autocomplete="off" spellcheck="false" aria-label="Llave de activación de escenario" required><button class="btn key-btn" type="submit">Registrar llave</button></form>
+        <p class="note">Sin una llave activa solo está habilitado <b>Contar historia</b>.</p></div>
     </div>
     <div><div class="kicker">Historia real</div><h2>Cuenta la historia de tu proyecto</h2>
     <p class="lead">Escríbela como en la planificación de un sprint: qué van a construir, para quién, con qué tecnología, dónde se despliega, qué datos maneja, con qué terceros se integra y si incluye IA.</p></div>
@@ -209,6 +209,7 @@ function vStory(){
     <div class="actions nav-row">
       <span id="reset-zone"><button class="btn danger" id="reset">Borrar mi historia</button></span></div>
   </div>`;
+  $('#key-form').onsubmit = e => { e.preventDefault(); if(!$('#scn-key').value.trim()) return; $('#scn-key').value = ''; showTokens(); };
   $('#r-name').oninput = e => { r.name = e.target.value; save(); };
   $('#r-story').oninput = e => { r.story = e.target.value; save(); $('#story-hint').textContent = storyHint(r.story); };
   $('#reset').onclick = () => {
@@ -681,6 +682,14 @@ function resetAll(){
   window.scrollTo({top: 0, behavior: reduce ? 'auto' : 'smooth'});
   toast('Entorno reiniciado');
 }
+
+/* Llave de escenario: aún no existen llaves reales, cualquier intento muestra el aviso. */
+function showTokens(){
+  const d = $('#tokens-dlg'); d.showModal();
+  say('Esa llave no está activa. Las llaves de escenario las entrega el <b>gestor del sistema</b>: <b>los tokens cuestan</b>.');
+}
+$('#tokens-close').onclick = () => $('#tokens-dlg').close();
+$('#tokens-dlg').addEventListener('click', e => { if(e.target === e.currentTarget) e.currentTarget.close(); });
 
 /* ---------- Ver skill ---------- */
 function mdToHtml(md){

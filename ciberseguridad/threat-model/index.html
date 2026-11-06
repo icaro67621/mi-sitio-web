@@ -8,8 +8,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/ciberseguridad/stride/stride.css?v=5" />
-  <link rel="stylesheet" href="/ciberseguridad/threat-model/tm.css?v=5" />
+  <link rel="stylesheet" href="/ciberseguridad/stride/stride.css?v=6" />
+  <link rel="stylesheet" href="/ciberseguridad/threat-model/tm.css?v=6" />
 </head>
 <body>
 
@@ -89,9 +89,38 @@
   <div class="skill-body" id="skill-body"><p class="note">Cargando…</p></div>
 </dialog>
 
+<dialog id="tokens-dlg" class="tokens-dlg" aria-labelledby="tokens-title">
+  <div class="tk-stage">
+    <div class="tk-holo" aria-hidden="true">
+      <div class="tk-fig">
+        <svg class="tk-svg" viewBox="0 0 100 112">
+          <line x1="50" y1="6" x2="50" y2="16" class="tk-s"/>
+          <circle cx="50" cy="5" r="3" class="tk-f"/>
+          <polygon points="50,14 86,30 86,72 50,92 14,72 14,30" class="tk-p"/>
+          <rect x="24" y="36" width="52" height="24" rx="6" class="tk-v"/>
+          <path d="M31 42 L43 47 M57 47 L69 42" class="tk-s brow"/>
+          <rect class="tk-f eye" x="33" y="47" width="10" height="8" rx="2"/>
+          <rect class="tk-f eye" x="57" y="47" width="10" height="8" rx="2"/>
+          <path d="M40 70 Q50 64 60 70" class="tk-s mouth"/>
+          <path d="M14 44 L6 44 L6 58 L14 58 M86 44 L94 44 L94 58 L86 58" class="tk-s"/>
+          <path d="M30 96 Q50 90 70 96 L78 112 L22 112 Z" class="tk-p"/>
+        </svg>
+      </div>
+      <div class="tk-beam"></div>
+      <div class="tk-base"></div>
+    </div>
+    <div class="tk-txt">
+      <div class="tk-kicker">KORA · LLAVE DE ACTIVACIÓN DE ESCENARIO NO VÁLIDA</div>
+      <h2 id="tokens-title" class="tk-title">Los Tokens cuestan</h2>
+      <p class="tk-sub">Solicita tu llave de activación al <b>gestor del sistema</b>.</p>
+      <button class="btn tk-close" id="tokens-close">Entendido</button>
+    </div>
+  </div>
+</dialog>
+
 <div class="toast" id="toast" hidden></div>
 
-<script src="/ciberseguridad/threat-model/tm-data.js?v=5"></script>
-<script src="/ciberseguridad/threat-model/tm.js?v=5"></script>
+<script src="/ciberseguridad/threat-model/tm-data.js?v=6"></script>
+<script src="/ciberseguridad/threat-model/tm.js?v=6"></script>
 </body>
 </html>

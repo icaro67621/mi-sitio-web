@@ -212,3 +212,30 @@ select.mini{padding:3px 6px;font-size:14px;width:auto}
 .key-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
 .key-row input{flex:1;min-width:200px;font-family:var(--f-mono);letter-spacing:.08em;opacity:.7}
 .key-row .btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* ===== Aviso "Los Tokens cuestan" (Kora holograma rojo) ===== */
+.key-btn{background:#f0b440;color:#1d0f02}
+.tokens-dlg{width:min(1100px,calc(100vw - 24px));max-width:none;max-height:calc(100vh - 24px);padding:0;border:2px solid #ff3b5c;border-radius:16px;background:radial-gradient(ellipse at 30% 80%,rgba(255,40,70,.25),transparent 60%),#0d0306;color:#ffd9df;box-shadow:0 0 60px rgba(255,40,70,.55),inset 0 0 60px rgba(255,40,70,.15);overflow:hidden}
+.tokens-dlg[open]{animation:tk-in .45s cubic-bezier(.2,1.3,.4,1)}
+.tokens-dlg::backdrop{background:rgba(30,0,6,.82)}
+.tokens-dlg::after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(255,80,100,.07) 0 1px,transparent 1px 4px)}
+.tk-stage{display:grid;grid-template-columns:minmax(220px,.9fr) minmax(0,1.2fr);align-items:center;gap:12px 24px;padding:28px 32px}
+@media (max-width:760px){.tk-stage{grid-template-columns:minmax(0,1fr);text-align:center;padding:20px 16px}}
+.tk-holo{position:relative;height:clamp(240px,46vh,440px);perspective:800px;display:flex;justify-content:center}
+.tk-fig{position:relative;width:72%;max-width:300px;aspect-ratio:100/112;transform-style:preserve-3d;animation:holo-sway 5s ease-in-out infinite alternate,holo-float 2.6s ease-in-out infinite;z-index:2}
+.tk-svg{width:100%;height:100%;overflow:visible;filter:drop-shadow(0 0 8px rgba(255,70,95,1)) drop-shadow(0 0 30px rgba(255,30,60,.7));animation:tk-flicker 2.2s infinite}
+.tk-p{fill:rgba(255,40,70,.16);stroke:#ff5a75;stroke-width:2}
+.tk-v{fill:rgba(255,40,70,.28);stroke:#ff5a75;stroke-opacity:.8}
+.tk-s{fill:none;stroke:#ff6f86;stroke-width:2;stroke-linecap:round}
+.tk-f{fill:#ffd0d8}
+.tk-s.mouth{stroke:#ffb3c0;stroke-width:2.5}
+.tk-beam{position:absolute;bottom:6%;left:50%;width:90%;height:85%;transform:translateX(-50%);clip-path:polygon(40% 100%,60% 100%,100% 0,0 0);background:linear-gradient(to top,rgba(255,70,95,.5),rgba(255,70,95,0) 85%);animation:holo-beam 1.6s ease-in-out infinite;z-index:1}
+.tk-base{position:absolute;bottom:2%;left:50%;width:60%;height:8%;transform:translateX(-50%);border-radius:50%;background:radial-gradient(ellipse at center,rgba(255,200,210,.9) 0 18%,rgba(255,40,70,.5) 45%,transparent 72%);border:1px solid rgba(255,90,117,.7);box-shadow:0 0 30px rgba(255,40,70,.7)}
+.tk-kicker{font-family:var(--f-mono);font-size:13px;letter-spacing:.14em;color:#ff8a9c}
+.tk-title{font-family:var(--f-display);font-weight:700;font-size:clamp(40px,7.5vw,96px);line-height:1.02;margin:10px 0 12px;color:#ff4d6a;text-shadow:0 0 12px rgba(255,60,90,.9),0 0 40px rgba(255,30,60,.6);text-transform:uppercase;letter-spacing:.02em;text-wrap:balance;animation:tk-flicker 3s infinite}
+.tk-sub{font-size:20px;margin:0 0 20px;color:#ffc2cc}
+.tk-sub b{color:#fff}
+.btn.tk-close{background:#ff3b5c;color:#1a0207;font-size:16px;padding:12px 28px;box-shadow:0 0 22px rgba(255,59,92,.6)}
+@keyframes tk-in{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:none}}
+@keyframes tk-flicker{0%,100%{opacity:1}41%{opacity:1}42%{opacity:.55}43%{opacity:1}77%{opacity:.85}78%{opacity:1}}
+@media (prefers-reduced-motion:reduce){.tokens-dlg[open]{animation:none}}
