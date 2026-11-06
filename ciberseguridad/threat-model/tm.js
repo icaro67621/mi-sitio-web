@@ -198,7 +198,7 @@ function vStory(){
       <div class="key-ico" aria-hidden="true">🔑</div>
       <div class="key-txt"><div class="kicker">Módulo en modo restringido</div>
         <p>Para poder usar este módulo en producción debe tener una <b>LLAVE DE ACTIVACIÓN DE ESCENARIO</b>, entregada por el <b>gestor del sistema</b>.</p>
-        <form class="key-row" id="key-form"><input id="scn-key" placeholder="LLAVE DE ACTIVACIÓN DE ESCENARIO" autocomplete="off" spellcheck="false" aria-label="Llave de activación de escenario" required><button class="btn key-btn" type="submit">Registrar llave</button></form>
+        <form class="key-row" id="key-form"><input id="scn-key" placeholder="LLAVE DE ACTIVACIÓN DE ESCENARIO" autocomplete="off" spellcheck="false" aria-label="Llave de activación de escenario"><button class="btn key-btn" type="submit">Registrar llave</button></form>
         <p class="note">Sin una llave activa solo está habilitado <b>Contar historia</b>.</p></div>
     </div>
     <div><div class="kicker">Historia real</div><h2>Cuenta la historia de tu proyecto</h2>
@@ -209,7 +209,7 @@ function vStory(){
     <div class="actions nav-row">
       <span id="reset-zone"><button class="btn danger" id="reset">Borrar mi historia</button></span></div>
   </div>`;
-  $('#key-form').onsubmit = e => { e.preventDefault(); if(!$('#scn-key').value.trim()) return; $('#scn-key').value = ''; showTokens(); };
+  $('#key-form').onsubmit = e => { e.preventDefault(); $('#scn-key').value = ''; showTokens(); };
   $('#r-name').oninput = e => { r.name = e.target.value; save(); };
   $('#r-story').oninput = e => { r.story = e.target.value; save(); $('#story-hint').textContent = storyHint(r.story); };
   $('#reset').onclick = () => {
