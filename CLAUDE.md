@@ -46,3 +46,7 @@ datos en `tm-data.js` → `DEMO`; luego "Iniciar modelado de amenazas" revela lo
 Kora, holograma, presenta los specs en su mano) e HISTORIA REAL
 (el usuario arma su modelo; sugerencias por palabras clave en `EL_HINTS` / `T_HINTS`).
 Al finalizar genera los specs de seguridad para el equipo. Sin IA en vivo ni backend.
+HISTORIA REAL está restringido: solo muestra "Contar historia" y un aviso de LLAVE DE
+ACTIVACIÓN DE ESCENARIO (la entrega el gestor del sistema; campo deshabilitado). La activación
+y el resto de módulos en ese modo quedan para un desarrollo posterior (el código sigue en `tm.js`,
+bloqueado en `renderTop`/`go`).

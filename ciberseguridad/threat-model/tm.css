@@ -204,3 +204,11 @@ select.mini{padding:3px 6px;font-size:14px;width:auto}
 @media (max-width:880px){.holo{height:180px}}
 .reset-all{display:flex;flex-direction:column;align-items:center;gap:8px;padding:18px;border:1px dashed #5a2030;border-radius:12px;text-align:center}
 .btn.danger.big{font-size:16px;padding:12px 24px}
+.key-lock{display:flex;gap:16px;align-items:flex-start;background:linear-gradient(135deg,rgba(224,164,58,.12),rgba(224,164,58,.03));border:1px solid #8a5a1a;border-radius:12px;padding:16px 18px}
+.key-ico{font-size:30px;line-height:1;filter:drop-shadow(0 0 10px rgba(240,180,64,.6))}
+.key-txt{flex:1;min-width:0}
+.key-txt p{margin:6px 0 0}
+.key-txt b{color:#f6c56a}
+.key-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.key-row input{flex:1;min-width:200px;font-family:var(--f-mono);letter-spacing:.08em;opacity:.7}
+.key-row .btn:disabled{opacity:.5;cursor:not-allowed}

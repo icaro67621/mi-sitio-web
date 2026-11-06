@@ -10,7 +10,7 @@ function load(){
   if(!r || !r.real) r = {mode:'demo', step:{demo:0, real:0}, demoFinal:false, demoEl:'P1', real:blankReal()};
   r.act = {story:false, ctx:false, started:false};
   r.step.demo = 0; r.demoFinal = false;
-  if(!r.real.started && r.step.real > 1) r.step.real = 0;
+  r.step.real = 0;
   return r;
 }
 function save(){ try{ const {act, ...keep} = APP; localStorage.setItem(KEY, JSON.stringify({...keep, step:{demo:0, real:APP.step.real}, demoFinal:false})); }catch(e){} }
@@ -130,7 +130,7 @@ const SAY = {
     'Aquí los tienes, en mi mano: los <b>specs de seguridad</b> para el equipo, con requisitos, criterios de aceptación y cómo verificarlos, trazados a cada amenaza.'
   ],
   real:[
-    WELCOME + ' Cuéntame la <b>historia</b> de tu proyecto.',
+    'Para usar <b>HISTORIA REAL</b> en producción necesitas una <b>LLAVE DE ACTIVACIÓN DE ESCENARIO</b>. Esta llave la entrega el <b>gestor del sistema</b>. Mientras tanto, puedes contarme la historia de tu proyecto.',
     '<b>Skill · paso 1.</b> El <b>BOT De Contexto</b> puede redactar un borrador técnico a partir de tu historia. Revísalo y corrígelo: lo que quede vacío pasará a <b>supuestos</b>.',
     '<b>Skill · paso 2.</b> Lista los elementos del sistema. Puedo <b>detectar candidatos</b> en tu historia; acepta los que correspondan y agrega los que falten. Escribe un límite de confianza por línea.',
     '<b>Skill · paso 3.</b> Elige un elemento y recorre las seis categorías. Para cada una: registra una amenaza o márcala como revisada / no aplica <b>con justificación</b>. Te sugiero amenazas según tu historia.',
@@ -142,6 +142,7 @@ const PRESENT = 'Gracias, bots: ya entiendo el sistema. Ahora tomo el control y 
 
 /* ---------- Modo y pasos ---------- */
 function setMode(mode){
+  if(mode === 'real') APP.step.real = 0;
   APP.mode = mode; save(); renderTop(); render();
   say(SAY[mode][APP.step[mode]]);
 }
@@ -151,6 +152,7 @@ function renderTop(fresh){
   $('#kora-mode').textContent = isDemo() ? 'BOT Act' : 'historia real';
   const fin = isDemo() ? APP.demoFinal : APP.real.finalized;
   $('#steps').innerHTML = STEPS.map((s, i) => {
+    if(!isDemo() && i > 0) return ''; /* HISTORIA REAL: solo Contar historia hasta tener la llave de activación */
     if(i >= 2 && !started()) return '';
     if(i === 5 && !fin) return '';
     const anim = fresh && ((fresh === 'start' && i >= 2 && i <= 4) || (fresh === 'fin' && i === 5)) ? ` reveal d${i}` : '';
@@ -158,6 +160,7 @@ function renderTop(fresh){
   }).join('');
 }
 function go(i, quiet, fresh){
+  if(!isDemo() && i > 0) return;
   APP.step[APP.mode] = i; save(); renderTop(fresh); render();
   if(!quiet) say(SAY[APP.mode][i]);
   window.scrollTo({top: 0, behavior: reduce ? 'auto' : 'smooth'});
@@ -191,18 +194,25 @@ function vStory(){
   }
   const r = APP.real;
   $('#view').innerHTML = `<div class="stack">
+    <div class="key-lock" role="note">
+      <div class="key-ico" aria-hidden="true">🔑</div>
+      <div class="key-txt"><div class="kicker">Módulo en modo restringido</div>
+        <p>Para poder usar este módulo en producción debe tener una <b>LLAVE DE ACTIVACIÓN DE ESCENARIO</b>, entregada por el <b>gestor del sistema</b>.</p>
+        <div class="key-row"><input id="scn-key" placeholder="LLAVE DE ACTIVACIÓN DE ESCENARIO" disabled aria-label="Llave de activación de escenario"><button class="btn" disabled>Activar escenario</button></div>
+        <p class="note">Activación disponible en un próximo desarrollo. Por ahora solo está habilitado <b>Contar historia</b>.</p></div>
+    </div>
     <div><div class="kicker">Historia real</div><h2>Cuenta la historia de tu proyecto</h2>
     <p class="lead">Escríbela como en la planificación de un sprint: qué van a construir, para quién, con qué tecnología, dónde se despliega, qué datos maneja, con qué terceros se integra y si incluye IA.</p></div>
     <label class="f">NOMBRE DEL SISTEMA<input id="r-name" value="${esc(r.name)}" placeholder="Ej.: Portal de autogestión de clientes"></label>
     <label class="f">HISTORIA<textarea id="r-story" class="story-in" placeholder="Ej.: Vamos a lanzar un portal donde los clientes suben facturas en PDF, consultan su estado y conversan con un asistente IA. El frontend es React, la API corre en AWS Lambda con base de datos Postgres, el login usa Cognito y los pagos van por Stripe…">${esc(r.story)}</textarea></label>
     <p class="note" id="story-hint">${storyHint(r.story)}</p>
-    <div class="actions nav-row"><button class="btn" data-go="1">Siguiente: contexto →</button>
-      <span id="reset-zone"><button class="btn danger" id="reset">Borrar mi modelo</button></span></div>
+    <div class="actions nav-row">
+      <span id="reset-zone"><button class="btn danger" id="reset">Borrar mi historia</button></span></div>
   </div>`;
   $('#r-name').oninput = e => { r.name = e.target.value; save(); };
   $('#r-story').oninput = e => { r.story = e.target.value; save(); $('#story-hint').textContent = storyHint(r.story); };
   $('#reset').onclick = () => {
-    $('#reset-zone').innerHTML = `<span class="confirm">¿Borrar historia, elementos y amenazas? <button class="btn danger" id="reset-yes">Sí, borrar</button><button class="btn ghost" id="reset-no">Cancelar</button></span>`;
+    $('#reset-zone').innerHTML = `<span class="confirm">¿Borrar la historia escrita? <button class="btn danger" id="reset-yes">Sí, borrar</button><button class="btn ghost" id="reset-no">Cancelar</button></span>`;
     $('#reset-yes').onclick = () => { APP.real = blankReal(); APP.step.real = 0; save(); renderTop(); vStory(); say('Hoja en blanco. Empieza por <b>qué construyen y para quién</b>.'); };
     $('#reset-no').onclick = vStory;
   };
