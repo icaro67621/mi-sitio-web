@@ -36,3 +36,11 @@ el manual y regenerar el PDF.
 ## Lab 03 · Remediación (VulnBank web)
 
 `bash tools/switch-lab.sh vuln|clean` (ramas base `lab-vuln-baseline` / `lab-clean-baseline`).
+
+## Conferencia · Threat Model Empresarial
+
+Página `/ciberseguridad/threat-model/` (tarjeta en la sección Conferencias). Kora aplica el
+skill `SKILL.md` (copia servida en la misma carpeta, botón "Ver skill") en dos modos:
+DEMO (historia guionizada de VulnBank, datos en `tm-data.js` → `DEMO`) e HISTORIA REAL
+(el usuario arma su modelo; sugerencias por palabras clave en `EL_HINTS` / `T_HINTS`).
+Al finalizar genera los specs de seguridad para el equipo. Sin IA en vivo ni backend.
