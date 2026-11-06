@@ -1,12 +1,17 @@
 /* Threat Model Empresarial · Kora aplica el skill stride-threat-modeling en dos modos:
-   DEMO (historia guionizada de VulnBank, solo lectura) e HISTORIA REAL (el usuario arma su modelo). */
+   BOT Act (bots de Historia y Contexto cargan VulnBank; Kora modela) e HISTORIA REAL (el usuario arma su modelo). */
 
 const KEY = 'kora-tm-v1';
-const blankReal = () => ({name:'', story:'', ctx:{}, boundaries:'', elements:[], cells:{}, threats:[], assumptions:'', finalized:false, el:null});
+const blankReal = () => ({name:'', story:'', ctx:{}, boundaries:'', elements:[], cells:{}, threats:[], assumptions:'', finalized:false, started:false, el:null});
 let APP;
 function load(){
-  try{ const r = JSON.parse(localStorage.getItem(KEY)); if(r && r.real) return r; }catch(e){}
-  return {mode:'demo', step:{demo:0, real:0}, demoFinal:false, demoEl:'P1', real:blankReal()};
+  let r = null;
+  try{ r = JSON.parse(localStorage.getItem(KEY)); }catch(e){}
+  if(!r || !r.real) r = {mode:'demo', step:{demo:0, real:0}, demoFinal:false, demoEl:'P1', real:blankReal()};
+  r.act ||= {story:false, ctx:false, started:false};
+  if(!r.act.started && r.step.demo > 1) r.step.demo = 0;
+  if(!r.real.started && r.step.real > 1) r.step.real = 0;
+  return r;
 }
 function save(){ try{ localStorage.setItem(KEY, JSON.stringify(APP)); }catch(e){} }
 APP = load();
@@ -16,6 +21,7 @@ const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const isDemo = () => APP.mode === 'demo';
 const M = () => isDemo() ? DEMO : APP.real;
+const started = () => isDemo() ? APP.act.started : APP.real.started;
 const catOf = k => STRIDE.find(c => c.k === k);
 const elOf = (m, id) => m.elements.find(e => e.id === id);
 const elName = (m, id) => (elOf(m, id) || {name:'(elemento eliminado)'}).name;
@@ -24,7 +30,7 @@ const risk = t => riskOf(t.imp, t.prob);
 const blocking = t => t.block ?? (risk(t) === 'Alto');
 const sortT = list => [...list].sort((a,b) => RANK[risk(a)] - RANK[risk(b)] || RANK[a.imp] - RANK[b.imp] || a.id.localeCompare(b.id));
 
-/* ---------- Kora ---------- */
+/* ---------- Kora (holograma) ---------- */
 let typing;
 function say(html){
   const b = $('#bubble'), av = $('#avatar');
@@ -39,72 +45,149 @@ function say(html){
     if(i >= parts.length){ clearInterval(typing); av.classList.remove('talking'); b.innerHTML = '<p>' + html + '</p>'; }
   }, 16);
 }
+/* Capas desplazadas en Z detrás de la figura para dar volumen de holograma. */
+(function holoDepth(){
+  const fig = $('#holo-fig'), svg = $('#avatar');
+  [-14, -7].forEach((z, i) => {
+    const c = svg.cloneNode(true);
+    c.removeAttribute('id'); c.querySelectorAll('[id]').forEach(n => n.removeAttribute('id'));
+    c.setAttribute('class', 'holo-svg holo-layer l' + i);
+    fig.insertBefore(c, svg);
+  });
+})();
 function toast(msg){ const t = $('#toast'); t.textContent = msg; t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => t.hidden = true, 2200); }
 
+/* Escritura progresiva dentro de la vista; se cancela si la vista cambia. */
+let run = 0;
+const sleep = ms => new Promise(r => setTimeout(r, reduce ? 0 : ms));
+function typeHTML(node, html, speed = 14){
+  const my = run;
+  return new Promise(res => {
+    if(reduce){ node.innerHTML = html; return res(true); }
+    const parts = html.match(/<[^>]+>|[^<]/g) || [];
+    let i = 0, out = '';
+    const t = setInterval(() => {
+      if(my !== run || !node.isConnected){ clearInterval(t); return res(false); }
+      for(let n = 0; n < 4 && i < parts.length; n++){ out += parts[i++]; while(i < parts.length && parts[i][0] === '<') out += parts[i++]; }
+      node.innerHTML = out + '<span class="caret"></span>';
+      if(i >= parts.length){ clearInterval(t); node.innerHTML = html; res(true); }
+    }, speed);
+  });
+}
+function typeValue(ta, text, speed = 12){
+  const my = run;
+  return new Promise(res => {
+    if(reduce){ ta.value = text; return res(true); }
+    let i = 0;
+    const t = setInterval(() => {
+      if(my !== run || !ta.isConnected){ clearInterval(t); return res(false); }
+      i = Math.min(text.length, i + 4); ta.value = text.slice(0, i); ta.scrollTop = ta.scrollHeight;
+      if(i >= text.length){ clearInterval(t); res(true); }
+    }, speed);
+  });
+}
+
+/* Bots ayudantes (Historia y Contexto). */
+const HELPER = {
+  story:{name:'BOT DE HISTORIA', role:'BACKLOG · HISTORIAS DE USUARIO', cls:'hb-story'},
+  ctx:{name:'BOT DE CONTEXTO', role:'ARQUITECTURA · CONTEXTO TÉCNICO', cls:'hb-ctx'}
+};
+function helperHTML(kind, msg, done){
+  const h = HELPER[kind];
+  return `<div class="helper ${h.cls}${done ? ' done' : ''}" id="helper">
+    <svg class="hb-av" viewBox="0 0 60 60" aria-hidden="true">
+      <rect x="10" y="14" width="40" height="34" rx="9" class="hb-shell"/>
+      <rect x="17" y="24" width="8" height="8" rx="2" class="hb-eye"/><rect x="35" y="24" width="8" height="8" rx="2" class="hb-eye"/>
+      <rect x="22" y="38" width="16" height="3" rx="1.5" class="hb-eye hb-mouth"/>
+      <line x1="30" y1="4" x2="30" y2="14" class="hb-line"/><circle cx="30" cy="4" r="3" class="hb-eye"/>
+    </svg>
+    <div class="hb-txt"><div class="hb-name">${h.name}</div><div class="hb-role">${h.role}</div>
+      <p class="hb-msg" id="helper-msg">${msg}</p>${done ? '' : '<div class="hb-bar"><i id="hb-prog"></i></div>'}</div>
+  </div>`;
+}
+function setProg(p){ const b = $('#hb-prog'); if(b) b.style.width = Math.round(p * 100) + '%'; }
+
+const WELCOME = 'Hola, soy un <b>BOT entrenado para entender tu sistema de información en un contexto empresarial</b> y ayudar a crear los <b>requerimientos de seguridad</b> que debería tener el desarrollo del mismo para mitigar los posibles riesgos de <b>CIBERSEGURIDAD</b>.';
+
 const FAQ = [
-  ['¿Qué es esta demo?', 'Una sesión de threat modeling <b>controlada</b>: en DEMO ves cómo un equipo pasa de una historia de desarrollo a specs de seguridad. En HISTORIA REAL haces lo mismo con tu proyecto.'],
+  ['¿Qué hace Kora?', 'Entiende tu sistema a partir de su historia y contexto, lo modela con <b>STRIDE</b> y lo convierte en <b>requerimientos de seguridad</b> que el equipo de desarrollo usa para escribir sus specs.'],
+  ['¿Quiénes son los otros bots?', 'El <b>Bot de Historia</b> trae las historias de usuario del backlog y el <b>Bot de Contexto</b> redacta el contexto técnico. Con eso, yo inicio el modelado de amenazas.'],
   ['¿Qué hace el skill?', 'Es el guion que sigo: <b>1</b> recolectar contexto, <b>2</b> descomponer el sistema, <b>3</b> STRIDE por elemento, <b>4</b> tabla de amenazas, <b>5</b> priorizar, <b>6</b> mitigaciones accionables y cerrar con <b>supuestos</b>. Tócalo en “Ver skill”.'],
   ['¿Por qué justificar lo que no aplica?', 'El skill lo exige: <b>no se omiten categorías</b>. Una casilla vacía puede ser un olvido; una casilla justificada es una decisión que el equipo puede revisar.'],
   ['¿Cómo se calcula el riesgo?', '<b>Impacto × probabilidad</b> en una matriz 3×3. Alto×Alta, Alto×Media y Medio×Alta dan riesgo Alto; los demás bajan a Medio o Bajo.'],
   ['¿Qué es “bloqueante”?', 'Una amenaza que <b>impide salir a producción</b> hasta tener su control. Por defecto son las de riesgo Alto; el resto entra al backlog con seguimiento.'],
   ['¿Cómo usa el equipo los specs?', 'Cada spec trae requisitos con <b>DEBE</b>, criterios de aceptación <b>Dado / Cuando / Entonces</b> y cómo verificarlo. Se copian a la historia de usuario y QA los convierte en pruebas.'],
-  ['¿Hay IA en vivo?', 'No. Para que la demo sea controlada y repetible, la historia DEMO y su modelo están preparados con el skill, y en HISTORIA REAL te sugiero amenazas con reglas del catálogo según lo que escribes.']
+  ['¿Hay IA en vivo?', 'No. Para que la sesión sea controlada y repetible, en BOT Act la historia y su modelo están preparados con el skill, y en HISTORIA REAL te sugiero amenazas con reglas del catálogo según lo que escribes.']
 ];
 
 const STEPS = ['Historia','Contexto','Descomposición','STRIDE por elemento','Amenazas y prioridad','Specs del equipo'];
 const SAY = {
   demo:[
-    'Bienvenido a la demo. Esta es la <b>historia</b> que trae el equipo: VulnBank, la app de los laboratorios, va a salir a producción con tres épicas nuevas. Léela y pasa al <b>contexto</b>: es lo primero que pide el skill.',
-    '<b>Skill · paso 1: recolección de contexto.</b> Antes de modelar confirmo cinco cosas: qué se construye, el flujo de datos, los activos críticos, la superficie de ataque y el despliegue. Aquí están las cinco; ninguna falta, así que puedo avanzar.',
+    WELCOME + ' Pulsa <b>BOT De Historia</b> para traer las historias de usuario.',
+    '<b>Skill · paso 1: recolección de contexto.</b> Antes de modelar necesito cinco cosas: qué se construye, el flujo de datos, los activos críticos, la superficie de ataque y el despliegue. Pídeselas al <b>BOT De Contexto</b>.',
     '<b>Skill · paso 2: descomposición.</b> Separé actores externos, procesos, almacenes y flujos, y marqué los <b>límites de confianza</b>. Ojo con el último: la salida del LLM hacia el backend también es un límite.',
     '<b>Skill · paso 3: STRIDE por elemento.</b> Recorro las seis categorías en cada elemento. Si una no aplica, lo <b>justifico</b>. Toca un elemento de la matriz para ver su análisis. El asistente Vicky tiene amenazas propias de IA: prompt injection, envenenamiento de contexto y exfiltración.',
     '<b>Skill · pasos 4, 5 y 6.</b> La tabla de amenazas ordenada por riesgo, cuáles <b>bloquean producción</b> y qué tipo de control es cada mitigación. Al final, los <b>supuestos asumidos</b>. Cuando estés listo, pulsa <b>Finalizar modelado</b>.',
-    'Este es el entregable para el equipo: <b>specs de seguridad</b> con requisitos, criterios de aceptación y cómo verificarlos, trazados a cada amenaza. Puedes copiarlos en Markdown.'
+    'Aquí los tienes, en mi mano: los <b>specs de seguridad</b> para el equipo, con requisitos, criterios de aceptación y cómo verificarlos, trazados a cada amenaza.'
   ],
   real:[
-    'Tu turno. Cuéntame la <b>historia real</b> de tu proyecto como se la contarías al equipo: qué construyen, para quién, con qué tecnología, qué integra con terceros y si hay IA. Mientras más concreto, mejores sugerencias.',
-    '<b>Skill · paso 1.</b> Completa el contexto. Si falta algo crítico te lo señalo: puedes seguir, pero quedará registrado como <b>supuesto</b>.',
+    WELCOME + ' Cuéntame la <b>historia</b> de tu proyecto.',
+    '<b>Skill · paso 1.</b> El <b>BOT De Contexto</b> puede redactar un borrador técnico a partir de tu historia. Revísalo y corrígelo: lo que quede vacío pasará a <b>supuestos</b>.',
     '<b>Skill · paso 2.</b> Lista los elementos del sistema. Puedo <b>detectar candidatos</b> en tu historia; acepta los que correspondan y agrega los que falten. Escribe un límite de confianza por línea.',
     '<b>Skill · paso 3.</b> Elige un elemento y recorre las seis categorías. Para cada una: registra una amenaza o márcala como revisada / no aplica <b>con justificación</b>. Te sugiero amenazas según tu historia.',
     '<b>Skill · pasos 4 a 6.</b> Ajusta impacto, probabilidad y tipo de control. Las de riesgo Alto quedan como bloqueantes (puedes cambiarlo). Agrega tus supuestos y pulsa <b>Finalizar modelado</b>.',
-    'Listo: estos son los <b>specs de seguridad</b> generados desde tu modelo. Llévalos a tu backlog y revisa el modelo cada vez que cambie la arquitectura.'
+    'Aquí los tienes, en mi mano: los <b>specs de seguridad</b> generados desde tu modelo. Llévalos a tu backlog y revisa el modelo cada vez que cambie la arquitectura.'
   ]
 };
+const PRESENT = 'Gracias, bots: ya entiendo el sistema. Ahora tomo el control y les presento los módulos del modelado: <b>Descomposición</b>, <b>STRIDE por elemento</b> y <b>Amenazas y prioridad</b>. Al finalizar, te entregaré los <b>specs del equipo</b>.';
 
 /* ---------- Modo y pasos ---------- */
 function setMode(mode){
   APP.mode = mode; save(); renderTop(); render();
   say(SAY[mode][APP.step[mode]]);
 }
-function renderTop(){
+function renderTop(fresh){
   $('#mode-demo').setAttribute('aria-pressed', isDemo());
   $('#mode-real').setAttribute('aria-pressed', !isDemo());
-  $('#kora-mode').textContent = isDemo() ? 'modo demo' : 'historia real';
+  $('#kora-mode').textContent = isDemo() ? 'BOT Act' : 'historia real';
   const fin = isDemo() ? APP.demoFinal : APP.real.finalized;
   $('#steps').innerHTML = STEPS.map((s, i) => {
-    const locked = i === 5 && !fin;
-    return `<button role="tab" class="step${i === 5 ? ' practice' : ''}" aria-selected="${APP.step[APP.mode] === i}" data-step="${i}" ${locked ? 'disabled title="Disponible al finalizar el modelado"' : ''}><span class="n">${i === 5 ? (locked ? '🔒' : '★') : '0' + (i + 1)}</span>${s}</button>`;
+    if(i >= 2 && !started()) return '';
+    if(i === 5 && !fin) return '';
+    const anim = fresh && ((fresh === 'start' && i >= 2 && i <= 4) || (fresh === 'fin' && i === 5)) ? ` reveal d${i}` : '';
+    return `<button role="tab" class="step${i === 5 ? ' practice holo-step' : ''}${anim}" aria-selected="${APP.step[APP.mode] === i}" data-step="${i}"><span class="n">${i === 5 ? '★' : '0' + (i + 1)}</span>${s}</button>`;
   }).join('');
 }
-function go(i, quiet){
-  APP.step[APP.mode] = i; save(); renderTop(); render();
+function go(i, quiet, fresh){
+  APP.step[APP.mode] = i; save(); renderTop(fresh); render();
   if(!quiet) say(SAY[APP.mode][i]);
   window.scrollTo({top: 0, behavior: reduce ? 'auto' : 'smooth'});
 }
-function render(){ [vStory, vContext, vDecomp, vAnalyze, vThreats, vSpecs][APP.step[APP.mode]](); }
+function render(){ run++; [vStory, vContext, vDecomp, vAnalyze, vThreats, vSpecs][APP.step[APP.mode]](); }
 const nav = (prev, next, nextLabel) => `<div class="actions nav-row">${prev !== null ? `<button class="btn ghost" data-go="${prev}">← Anterior</button>` : ''}${next !== null ? `<button class="btn" data-go="${next}">${nextLabel}</button>` : ''}</div>`;
+function startModel(){
+  if(isDemo()) APP.act.started = true; else APP.real.started = true;
+  save(); go(2, true, 'start'); say(PRESENT);
+}
+const startBtn = () => `<div class="start-zone"><button class="btn start" id="start-model">Iniciar modelado de amenazas</button><p class="note">Kora toma el control y presenta los módulos del modelado.</p></div>`;
 
 /* ---------- 1. Historia ---------- */
+function storyFieldHTML(s){
+  return `<div class="kicker">Historia del desarrollo</div><h2>${s.title}</h2><p class="note">${s.who}</p>`;
+}
 function vStory(){
   if(isDemo()){
-    const s = DEMO.story;
+    const s = DEMO.story, done = APP.act.story;
     $('#view').innerHTML = `<div class="stack">
-      <div><div class="kicker">Historia del desarrollo · DEMO</div><h2>${s.title}</h2><p class="note">${s.who}</p></div>
-      <article class="story">${s.paras.map(p => `<p>${p}</p>`).join('')}</article>
-      <div><h3>Historias de usuario del sprint</h3>
-        <ul class="epics">${s.epics.map(([id, t]) => `<li><span class="tag">${id}</span>${t}</li>`).join('')}</ul></div>
-      ${nav(null, 1, 'Iniciar modelado: contexto →')}
+      <div class="bot-launch"><button class="btn bot-btn" id="bot-story" ${done ? 'disabled' : ''}>🤖 BOT De Historia</button>
+        <span class="note">${done ? 'Historia cargada desde el backlog del sprint.' : 'Trae las historias de usuario y llena el campo de historia.'}</span></div>
+      <div id="helper-zone">${done ? helperHTML('story', 'Listo: traje la historia y 5 historias de usuario del sprint 14.', true) : ''}</div>
+      <label class="f">HISTORIA</label>
+      <div class="field story-field${done ? '' : ' empty-field'}" id="story-field">${done ? storyFieldHTML(s) + `<article class="story">${s.paras.map(p => `<p>${p}</p>`).join('')}</article>` : '<p class="note">El campo está vacío. Pulsa <b>BOT De Historia</b>.</p>'}</div>
+      <div id="epics-zone">${done ? epicsHTML(s.epics) : ''}</div>
+      <div id="story-nav">${done ? nav(null, 1, 'Siguiente: contexto →') : ''}</div>
     </div>`;
+    if(!done) $('#bot-story').onclick = runStoryBot;
     return;
   }
   const r = APP.real;
@@ -125,6 +208,37 @@ function vStory(){
     $('#reset-no').onclick = vStory;
   };
 }
+const epicsHTML = epics => `<h3>Historias de usuario del sprint</h3><ul class="epics">${epics.map(([id, t]) => `<li><span class="tag">${id}</span>${t}</li>`).join('')}</ul>`;
+async function runStoryBot(){
+  const s = DEMO.story, my = run;
+  $('#bot-story').disabled = true;
+  $('#helper-zone').innerHTML = helperHTML('story', '', false);
+  say('Llamo al <b>BOT De Historia</b> para que traiga las historias de usuario.');
+  const msg = $('#helper-msg');
+  if(!await typeHTML(msg, 'Estoy trayendo el contexto de las historias de usuario…', 22)) return;
+  await sleep(400);
+  const f = $('#story-field'); f.classList.remove('empty-field'); f.innerHTML = '<div id="sf-h"></div><article class="story" id="sf-b"></article>';
+  if(!await typeHTML($('#sf-h'), storyFieldHTML(s), 8)) return;
+  for(let i = 0; i < s.paras.length; i++){
+    setProg((i + 1) / (s.paras.length + 1));
+    const p = document.createElement('p'); $('#sf-b').appendChild(p);
+    if(!await typeHTML(p, s.paras[i], 10)) return;
+  }
+  const ez = $('#epics-zone'); ez.innerHTML = '<h3>Historias de usuario del sprint</h3><ul class="epics" id="ep"></ul>';
+  for(const [id, t] of s.epics){
+    if(my !== run) return;
+    const li = document.createElement('li'); li.className = 'pop'; li.innerHTML = `<span class="tag">${id}</span>${t}`; $('#ep').appendChild(li);
+    await sleep(260);
+  }
+  setProg(1);
+  APP.act.story = true; save();
+  await sleep(300);
+  if(my !== run) return;
+  $('#helper').classList.add('done');
+  await typeHTML(msg, 'Listo: traje la historia y 5 historias de usuario del sprint 14.', 16);
+  $('#story-nav').innerHTML = nav(null, 1, 'Siguiente: contexto →');
+  say('Gracias, <b>Bot de Historia</b>. Ya tengo la historia: VulnBank sale a producción con panel de soporte, previsualizador de enlaces y un asistente IA. Vamos al <b>contexto</b>.');
+}
 function storyHint(t){
   const n = (t || '').trim().split(/\s+/).filter(Boolean).length;
   if(!n) return 'Kora detectará actores, componentes y riesgos típicos a partir de lo que escribas.';
@@ -137,25 +251,107 @@ function missingCtx(m){ return CTX_FIELDS.filter(([k]) => !(m.ctx[k] || '').trim
 function vContext(){
   const m = M();
   if(isDemo()){
+    if(!APP.act.story){
+      $('#view').innerHTML = `<div class="stack"><div class="empty">Primero el <b>BOT De Historia</b> tiene que traer la historia.</div>${nav(0, null)}</div>`;
+      return;
+    }
+    const done = APP.act.ctx;
     $('#view').innerHTML = `<div class="stack">
-      <div><div class="kicker">Skill · 1. Recolección de contexto</div><h2>Lo que Kora confirma antes de modelar</h2></div>
-      <div class="ctx-grid">${CTX_FIELDS.map(([k, t]) => `<div class="ctx"><div class="ctx-h"><span class="ok-dot">✓</span>${t}</div><p>${esc(m.ctx[k])}</p></div>`).join('')}</div>
-      ${nav(0, 2, 'Siguiente: descomposición →')}
+      <div><div class="kicker">Skill · 1. Recolección de contexto</div><h2>Contexto técnico</h2></div>
+      <div class="bot-launch"><button class="btn bot-btn ctx" id="bot-ctx" ${done ? 'disabled' : ''}>🤖 BOT De Contexto</button>
+        <span class="note">${done ? 'Contexto técnico generado.' : 'Genera el contexto técnico a partir de la historia.'}</span></div>
+      <div id="helper-zone">${done ? helperHTML('ctx', 'Listo: contexto técnico generado con los 5 puntos que pide el skill.', true) : ''}</div>
+      <div class="ctx-grid">${CTX_FIELDS.map(([k, t]) => `<div class="ctx${done ? '' : ' empty-field'}" data-cbox="${k}"><div class="ctx-h"><span class="ok-dot">${done ? '✓' : '·'}</span>${t}</div><p>${done ? esc(m.ctx[k]) : ''}</p></div>`).join('')}</div>
+      <div id="ctx-next">${done ? (APP.act.started ? nav(0, 2, 'Siguiente: descomposición →') : startBtn()) : nav(0, null)}</div>
     </div>`;
+    if(!done) $('#bot-ctx').onclick = runCtxBot;
+    else if(!APP.act.started) $('#start-model').onclick = startModel;
     return;
   }
   const miss = missingCtx(m);
   $('#view').innerHTML = `<div class="stack">
     <div><div class="kicker">Skill · 1. Recolección de contexto</div><h2>Antes de modelar, confirmemos el contexto</h2>
     <p class="lead">Si falta algo crítico, el skill pide preguntar antes de avanzar. Puedes continuar, pero lo que quede vacío pasará a <b>Supuestos asumidos</b>.</p></div>
-    ${m.story.trim() ? `<details class="story-peek"><summary>Ver mi historia</summary><p>${esc(m.story)}</p></details>` : '<div class="empty">Aún no escribiste la historia. Vuelve al paso 1 para que Kora pueda sugerirte cosas.</div>'}
+    ${m.story.trim() ? `<details class="story-peek"><summary>Ver mi historia</summary><p>${esc(m.story)}</p></details>` : '<div class="empty">Aún no escribiste la historia. Vuelve al paso 1 para que los bots y Kora puedan ayudarte.</div>'}
+    <div class="bot-launch"><button class="btn bot-btn ctx" id="bot-ctx" ${m.story.trim() ? '' : 'disabled'}>🤖 BOT De Contexto</button>
+      <span class="note">Redacta un borrador del contexto técnico a partir de tu historia (reemplaza lo escrito).</span></div>
+    <div id="helper-zone"></div>
     ${CTX_FIELDS.map(([k, t, h]) => `<label class="f">${t.toUpperCase()}<textarea data-ctx="${k}" placeholder="${esc(h)}">${esc(m.ctx[k])}</textarea></label>`).join('')}
     <p class="note" id="ctx-miss">${ctxMissText(miss)}</p>
-    ${nav(0, 2, 'Siguiente: descomposición →')}
+    ${m.started ? nav(0, 2, 'Siguiente: descomposición →') : `${startBtn()}${nav(0, null)}`}
   </div>`;
   document.querySelectorAll('[data-ctx]').forEach(ta => ta.oninput = e => { m.ctx[ta.dataset.ctx] = e.target.value; save(); $('#ctx-miss').innerHTML = ctxMissText(missingCtx(m)); });
+  $('#bot-ctx').onclick = runCtxBot;
+  const sb = $('#start-model'); if(sb) sb.onclick = startModel;
 }
 const ctxMissText = miss => miss.length ? `<span class="c-amber">Falta: ${miss.map(x => x[1].toLowerCase()).join(', ')}.</span>` : '<span class="c-baja">Contexto completo.</span>';
+
+/* Borrador de contexto para HISTORIA REAL, armado con reglas sobre la historia. */
+function draftCtx(story){
+  const has = re => re.test(story);
+  const els = [...new Map(EL_HINTS.filter(h => h.re.test(story)).map(h => [h.name, h])).values()];
+  const by = t => els.filter(e => e.type === t).map(e => e.name);
+  const first = story.trim().split(/(?<=[.!?])\s+/).slice(0, 2).join(' ');
+  const flow = [by('ext').join(', ') || 'Usuario', by('proc').join(' → ') || 'aplicación', by('store').join(', ')].filter(Boolean).join(' → ');
+  const act = [
+    has(/login|contraseñ|sesi|auth|cognito|sso|oauth/i) && 'credenciales y sesiones',
+    has(/client|usuari|paciente|ciudadan|estudiante/i) && 'datos personales de usuarios (PII)',
+    has(/pago|tarjeta|cobro|transfer|stripe|paypal/i) && 'datos de pago y capacidad de mover dinero',
+    has(/archivo|factura|pdf|documento|adjunto|subir/i) && 'documentos cargados por los usuarios',
+    has(/admin|soporte|panel/i) && 'funciones y rol de administración',
+    has(/ia\b|llm|gpt|claude|asistente|chatbot|agente/i) && 'prompts, historial y herramientas del asistente IA',
+    'secretos de la aplicación (llaves, cadenas de conexión)'
+  ].filter(Boolean);
+  const sup = [
+    has(/api|backend|servicio|lambda|function/i) && 'endpoints públicos de la API',
+    has(/login|auth|cognito|sso/i) && 'formulario y endpoint de login',
+    has(/archivo|subir|upload|pdf|adjunto/i) && 'carga de archivos',
+    has(/webhook|integraci|tercero|stripe|paypal|erp|crm/i) && 'integraciones y webhooks de terceros',
+    has(/url|enlace|link/i) && 'URLs proporcionadas por el usuario',
+    has(/ia\b|llm|gpt|claude|asistente|chatbot|agente/i) && 'texto libre enviado al LLM y contenido que el LLM lee',
+    has(/admin|panel|soporte/i) && 'panel administrativo'
+  ].filter(Boolean);
+  const cloud = (story.match(/\b(aws|azure|gcp|google cloud|lambda|cognito|firebase|vercel|heroku|on-?prem|kubernetes|docker)\b/ig) || []).map(x => x.toLowerCase());
+  const auth = (story.match(/\b(jwt|oauth|openid|sso|cognito|entra|auth0|okta|mfa|contraseña)\b/ig) || []).map(x => x.toLowerCase());
+  const nm = 'No se menciona en la historia: completar.';
+  return {
+    que: first || nm,
+    diagrama: els.length ? flow + '. (Borrador generado desde la historia: validar con el arquitecto.)' : nm,
+    activos: act.length > 1 ? act.join(' · ') + '.' : nm,
+    superficie: sup.length ? sup.join(' · ') + '.' : nm,
+    despliegue: [cloud.length ? 'Plataforma: ' + [...new Set(cloud)].join(', ') : 'Plataforma: no indicada', auth.length ? 'autenticación: ' + [...new Set(auth)].join(', ') : 'autenticación: no indicada', has(/ia\b|llm|gpt|claude|asistente|chatbot|agente/i) ? 'incluye componente de IA/LLM' : 'sin componentes de IA mencionados'].join(' · ') + '.'
+  };
+}
+async function runCtxBot(){
+  const demo = isDemo(), m = M(), my = run;
+  $('#bot-ctx').disabled = true;
+  $('#helper-zone').innerHTML = helperHTML('ctx', '', false);
+  say('Llamo al <b>BOT De Contexto</b> para que genere el contexto técnico.');
+  if(!await typeHTML($('#helper-msg'), 'Voy a generar el contexto técnico a partir de la historia…', 22)) return;
+  await sleep(300);
+  const src = demo ? DEMO.ctx : draftCtx(m.story);
+  for(let i = 0; i < CTX_FIELDS.length; i++){
+    const k = CTX_FIELDS[i][0];
+    setProg(i / CTX_FIELDS.length);
+    if(demo){
+      const box = document.querySelector(`[data-cbox="${k}"]`); box.classList.remove('empty-field'); box.classList.add('writing');
+      if(!await typeHTML(box.querySelector('p'), esc(src[k]), 9)) return;
+      box.classList.remove('writing'); box.querySelector('.ok-dot').textContent = '✓';
+    } else {
+      const ta = document.querySelector(`[data-ctx="${k}"]`);
+      if(!await typeValue(ta, src[k], 10)) return;
+      m.ctx[k] = src[k]; save(); $('#ctx-miss').innerHTML = ctxMissText(missingCtx(m));
+    }
+  }
+  setProg(1);
+  if(demo){ APP.act.ctx = true; save(); }
+  if(my !== run) return;
+  $('#helper').classList.add('done');
+  await typeHTML($('#helper-msg'), demo ? 'Listo: contexto técnico generado con los 5 puntos que pide el skill.' : 'Listo: dejé un borrador. Corrige lo que no sea exacto antes de modelar.', 16);
+  if(demo){ $('#ctx-next').innerHTML = startBtn(); $('#start-model').onclick = startModel; }
+  else $('#bot-ctx').disabled = false;
+  say(demo ? 'Contexto completo: no falta ningún punto crítico. Cuando quieras, pulsa <b>Iniciar modelado de amenazas</b>.' : 'Revisa el borrador del <b>BOT De Contexto</b>: lo marcado como “completar” pasará a supuestos si lo dejas así. Luego pulsa <b>Iniciar modelado de amenazas</b>.');
+}
 
 /* ---------- 3. Descomposición ---------- */
 function bList(m){ return Array.isArray(m.boundaries) ? m.boundaries : (m.boundaries || '').split('\n').map(s => s.trim()).filter(Boolean); }
@@ -355,10 +551,10 @@ function prioItem(t, demo){
   return `<div class="pitem"><span class="tag">${t.id}</span><span class="pdesc">${esc(t.desc.length > 110 ? t.desc.slice(0, 107) + '…' : t.desc)}</span>${demo ? '' : `<label class="blk-tg"><input type="checkbox" data-block="${t.id}" ${blocking(t) ? 'checked' : ''}> bloqueante</label>`}</div>`;
 }
 function finish(){
-  if(isDemo()){ APP.demoFinal = true; save(); go(5); return; }
+  if(isDemo()){ APP.demoFinal = true; save(); go(5, false, 'fin'); return; }
   const m = APP.real;
   if(!m.threats.length){ say('Todavía no hay amenazas registradas. Sin amenazas no hay specs: vuelve al paso 4 y recorre al menos los procesos principales.'); return; }
-  m.finalized = true; save(); go(5);
+  m.finalized = true; save(); go(5, false, 'fin');
 }
 
 /* ---------- 6. Specs ---------- */
@@ -393,13 +589,48 @@ function specsMarkdown(m, specs){
     ...sortT(m.threats).map(t => `| ${t.id} | ${elName(m, t.el)} | ${t.cat} | ${risk(t)} | ${blocking(t) ? 'Sí' : 'No'} | ${(t.mit || 'Pendiente').replace(/\|/g, '/')} |`), '', '## Supuestos asumidos', ...allAssumptions(m).map(a => `- ${a}`));
   return L.join('\n');
 }
+/* Kora holograma de cuerpo entero sosteniendo los specs en la mano. */
+function holoStage(specs, nb, m){
+  return `<div class="holo-stage" aria-label="Kora presenta ${specs.length} specs de seguridad">
+    <div class="hs-fig">
+      <svg class="hs-svg" viewBox="0 0 300 300" aria-hidden="true">
+        <defs><linearGradient id="hsbeam" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#5fe9f5" stop-opacity=".55"/><stop offset="1" stop-color="#5fe9f5" stop-opacity="0"/></linearGradient></defs>
+        <polygon points="196,112 214,112 292,6 150,6" fill="url(#hsbeam)" class="hs-handbeam"/>
+        <g class="hs-body">
+          <line x1="90" y1="14" x2="90" y2="26" class="hs-s"/><circle cx="90" cy="12" r="3.5" class="hs-f"/>
+          <polygon points="90,24 126,40 126,82 90,102 54,82 54,40" class="hs-p"/>
+          <rect x="64" y="46" width="52" height="24" rx="6" class="hs-v"/>
+          <rect x="73" y="53" width="10" height="10" rx="2" class="hs-f eye"/><rect x="97" y="53" width="10" height="10" rx="2" class="hs-f eye"/>
+          <rect x="80" y="76" width="20" height="3" rx="1.5" class="hs-m"/>
+          <path d="M54 54 L46 54 L46 68 L54 68 M126 54 L134 54 L134 68 L126 68" class="hs-s"/>
+          <rect x="84" y="102" width="12" height="10" class="hs-p"/>
+          <path d="M58 116 Q90 106 122 116 L130 196 Q90 206 50 196 Z" class="hs-p"/>
+          <path d="M70 140 H110 M74 160 H106" class="hs-s thin"/>
+          <path d="M58 120 Q40 150 46 190" class="hs-s arm"/><circle cx="46" cy="194" r="5" class="hs-p"/>
+          <path d="M122 120 Q160 136 178 124 L200 114" class="hs-s arm"/>
+          <path d="M196 116 Q206 104 218 110 M200 112 L194 102 M206 108 L204 98 M212 109 L214 100 M218 112 L224 105" class="hs-s thin"/>
+        </g>
+        <ellipse cx="90" cy="262" rx="70" ry="12" class="hs-base"/>
+        <ellipse cx="90" cy="262" rx="44" ry="7" class="hs-base in"/>
+        <polygon points="40,262 140,262 120,200 60,200" class="hs-cone"/>
+      </svg>
+      <div class="hs-panel">
+        <div class="hs-k">SPECS DE SEGURIDAD</div>
+        <div class="hs-n">${specs.length}</div>
+        <div class="hs-sub"><span class="c-alta">${nb} bloqueantes</span> · ${m.threats.length} amenazas</div>
+        <ul class="hs-list">${specs.slice(0, 6).map(s => `<li><span>${s.id.replace('SPEC-', '')}</span>${esc(s.title)}</li>`).join('')}${specs.length > 6 ? `<li class="more">+${specs.length - 6} más</li>` : ''}</ul>
+      </div>
+    </div>
+    <p class="hs-cap"><b>KORA</b> · “Aquí tienes los requerimientos de seguridad para el equipo de desarrollo.”</p>
+  </div>`;
+}
 function vSpecs(){
   const m = M(), specs = buildSpecs(m);
   const nb = specs.filter(s => specPriority(m, s)[0] === 'blk').length;
   $('#view').innerHTML = `<div class="stack">
-    <div><div class="kicker">Resultado del modelado · para el equipo de desarrollo</div><h2>Specs de seguridad</h2>
-    <p class="lead">Cada spec agrupa amenazas relacionadas y trae lo que el equipo necesita para escribir y aceptar la historia: requisitos verificables, criterios de aceptación y cómo probarlo.</p></div>
-    <div class="stats"><div class="stat"><b>${specs.length}</b>specs</div><div class="stat"><b class="c-alta">${nb}</b>bloqueantes</div><div class="stat"><b>${m.threats.length}</b>amenazas trazadas</div></div>
+    <div><div class="kicker">Resultado del modelado · para el equipo de desarrollo</div><h2>Specs de seguridad</h2></div>
+    ${holoStage(specs, nb, m)}
+    <p class="lead">Cada spec agrupa amenazas relacionadas y trae lo que el equipo necesita para escribir y aceptar la historia: requisitos verificables, criterios de aceptación y cómo probarlo.</p>
     <div class="actions"><button class="btn" id="copy-md">Copiar como Markdown</button><button class="btn ghost" id="dl-md">Descargar .md</button></div>
     <textarea id="md-out" class="md-out" hidden readonly></textarea>
     <div class="specs">${specs.map(s => { const [pk, p] = specPriority(m, s); return `

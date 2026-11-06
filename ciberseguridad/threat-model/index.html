@@ -16,15 +16,15 @@
 <div class="wrap">
   <header class="top">
     <a class="back" href="/ciberseguridad/#conferencias">← Conferencias</a>
-    <span class="badge">THREAT MODELING</span><span class="badge blue">CONFERENCIA · DEMO EN VIVO</span>
+    <span class="badge">THREAT MODELING</span><span class="badge blue">CONFERENCIA</span>
     <h1>Threat Model Empresarial</h1>
     <p class="sub">De una historia de desarrollo a los specs de seguridad que el equipo implementa. Kora aplica el skill de STRIDE paso a paso: contexto, descomposición, análisis por elemento, priorización y supuestos.</p>
   </header>
 
-  <div class="modebar" role="group" aria-label="Modo de la demo">
+  <div class="modebar" role="group" aria-label="Modo">
     <button class="mode" id="mode-demo" data-mode="demo">
-      <span class="mode-k">DEMO</span>
-      <span class="mode-d">Historia guionizada: el desarrollo de VulnBank</span>
+      <span class="mode-k">BOT Act</span>
+      <span class="mode-d">Los bots cargan la historia y el contexto de VulnBank; Kora modela</span>
     </button>
     <button class="mode" id="mode-real" data-mode="real">
       <span class="mode-k">HISTORIA REAL</span>
@@ -35,26 +35,31 @@
 
   <div class="grid">
     <aside class="avatar-col hud" aria-label="Avatar guía">
-      <div class="avatar-head">
-        <svg class="avatar-svg" id="avatar" viewBox="0 0 100 100" aria-hidden="true">
-          <defs>
-            <linearGradient id="vg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0d2e38"/><stop offset="1" stop-color="#051419"/></linearGradient>
-          </defs>
-          <line x1="50" y1="6" x2="50" y2="16" stroke="#22c59a" stroke-width="2"/>
-          <circle cx="50" cy="5" r="3" fill="#22c59a"/>
-          <polygon points="50,14 86,30 86,72 50,92 14,72 14,30" fill="#06131a" stroke="#14b8c4" stroke-width="2"/>
-          <rect x="24" y="36" width="52" height="24" rx="6" fill="url(#vg)" stroke="#1d5a66"/>
-          <rect class="eye" x="33" y="43" width="10" height="10" rx="2" fill="#14b8c4"/>
-          <rect class="eye" x="57" y="43" width="10" height="10" rx="2" fill="#14b8c4"/>
-          <rect id="mouth" x="40" y="65" width="20" height="3" rx="1.5" fill="#22c59a"/>
-          <path d="M14 44 L6 44 L6 58 L14 58" fill="none" stroke="#1d5a66" stroke-width="2"/>
-          <path d="M86 44 L94 44 L94 58 L86 58" fill="none" stroke="#1d5a66" stroke-width="2"/>
-        </svg>
-        <div>
-          <p class="avatar-name">KORA</p>
-          <div class="avatar-role">GUÍA DE THREAT MODELING</div>
-          <div class="status"><i></i><span id="kora-mode">modo demo</span></div>
+      <div class="holo" aria-hidden="true">
+        <div class="holo-fig" id="holo-fig">
+          <svg class="holo-svg" id="avatar" viewBox="0 0 100 112">
+            <defs>
+              <linearGradient id="vg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#14b8c4" stop-opacity=".35"/><stop offset="1" stop-color="#14b8c4" stop-opacity=".05"/></linearGradient>
+            </defs>
+            <line x1="50" y1="6" x2="50" y2="16" stroke="#7ff3ff" stroke-width="2"/>
+            <circle cx="50" cy="5" r="3" fill="#7ff3ff"/>
+            <polygon points="50,14 86,30 86,72 50,92 14,72 14,30" fill="rgba(20,184,196,.12)" stroke="#5fe9f5" stroke-width="2"/>
+            <rect x="24" y="36" width="52" height="24" rx="6" fill="url(#vg)" stroke="#5fe9f5" stroke-opacity=".7"/>
+            <rect class="eye" x="33" y="43" width="10" height="10" rx="2" fill="#b9fbff"/>
+            <rect class="eye" x="57" y="43" width="10" height="10" rx="2" fill="#b9fbff"/>
+            <rect id="mouth" x="40" y="65" width="20" height="3" rx="1.5" fill="#7dffd2"/>
+            <path d="M14 44 L6 44 L6 58 L14 58" fill="none" stroke="#5fe9f5" stroke-width="2"/>
+            <path d="M86 44 L94 44 L94 58 L86 58" fill="none" stroke="#5fe9f5" stroke-width="2"/>
+            <path d="M30 96 Q50 90 70 96 L78 112 L22 112 Z" fill="rgba(20,184,196,.12)" stroke="#5fe9f5" stroke-width="1.5"/>
+          </svg>
         </div>
+        <div class="holo-beam"></div>
+        <div class="holo-base"></div>
+      </div>
+      <div class="holo-id">
+        <p class="avatar-name">KORA</p>
+        <div class="avatar-role">BOT DE THREAT MODELING</div>
+        <div class="status"><i></i><span id="kora-mode">BOT Act</span></div>
       </div>
       <div class="bubble" id="bubble" aria-live="polite"></div>
       <div class="ask-label">Pregúntale a Kora</div>
@@ -76,7 +81,7 @@
     </div>
     <button class="x" id="close-skill" aria-label="Cerrar">×</button>
   </div>
-  <p class="note">Este es el archivo <span class="mono">SKILL.md</span> completo que guía el modelado. Cada paso de la demo indica qué sección del skill está aplicando.</p>
+  <p class="note">Este es el archivo <span class="mono">SKILL.md</span> completo que guía el modelado. Cada paso del modelado indica qué sección del skill está aplicando.</p>
   <div class="actions dlg-actions">
     <a class="btn ghost" href="/ciberseguridad/threat-model/SKILL.md" download>Descargar SKILL.md</a>
     <a class="btn ghost" href="/ciberseguridad/threat-model/stride-threat-modeling.skill" download>Descargar .skill</a>
