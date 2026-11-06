@@ -8,12 +8,12 @@ function load(){
   let r = null;
   try{ r = JSON.parse(localStorage.getItem(KEY)); }catch(e){}
   if(!r || !r.real) r = {mode:'demo', step:{demo:0, real:0}, demoFinal:false, demoEl:'P1', real:blankReal()};
-  r.act ||= {story:false, ctx:false, started:false};
-  if(!r.act.started && r.step.demo > 1) r.step.demo = 0;
+  r.act = {story:false, ctx:false, started:false};
+  r.step.demo = 0; r.demoFinal = false;
   if(!r.real.started && r.step.real > 1) r.step.real = 0;
   return r;
 }
-function save(){ try{ localStorage.setItem(KEY, JSON.stringify(APP)); }catch(e){} }
+function save(){ try{ const {act, ...keep} = APP; localStorage.setItem(KEY, JSON.stringify({...keep, step:{demo:0, real:APP.step.real}, demoFinal:false})); }catch(e){} }
 APP = load();
 
 const $ = s => document.querySelector(s);
@@ -123,7 +123,7 @@ const FAQ = [
 const STEPS = ['Historia','Contexto','Descomposición','STRIDE por elemento','Amenazas y prioridad','Specs del equipo'];
 const SAY = {
   demo:[
-    WELCOME + ' Pulsa <b>BOT De Historia</b> para traer las historias de usuario.',
+    WELCOME + ' Cuando quieras, pulsa <b>CONTAR HISTORIA</b>.',
     '<b>Skill · paso 1: recolección de contexto.</b> Antes de modelar necesito cinco cosas: qué se construye, el flujo de datos, los activos críticos, la superficie de ataque y el despliegue. Pídeselas al <b>BOT De Contexto</b>.',
     '<b>Skill · paso 2: descomposición.</b> Separé actores externos, procesos, almacenes y flujos, y marqué los <b>límites de confianza</b>. Ojo con el último: la salida del LLM hacia el backend también es un límite.',
     '<b>Skill · paso 3: STRIDE por elemento.</b> Recorro las seis categorías en cada elemento. Si una no aplica, lo <b>justifico</b>. Toca un elemento de la matriz para ver su análisis. El asistente Vicky tiene amenazas propias de IA: prompt injection, envenenamiento de contexto y exfiltración.',
@@ -179,11 +179,11 @@ function vStory(){
   if(isDemo()){
     const s = DEMO.story, done = APP.act.story;
     $('#view').innerHTML = `<div class="stack">
-      <div class="bot-launch"><button class="btn bot-btn" id="bot-story" ${done ? 'disabled' : ''}>🤖 BOT De Historia</button>
-        <span class="note">${done ? 'Historia cargada desde el backlog del sprint.' : 'Trae las historias de usuario y llena el campo de historia.'}</span></div>
+      <div class="bot-launch"><button class="btn bot-btn" id="bot-story" ${done ? 'disabled' : ''}>🤖 CONTAR HISTORIA</button>
+        <span class="note">${done ? 'Historia cargada desde el backlog del sprint.' : 'El BOT De Historia escribirá la historia de usuario línea por línea.'}</span></div>
       <div id="helper-zone">${done ? helperHTML('story', 'Listo: traje la historia y 5 historias de usuario del sprint 14.', true) : ''}</div>
       <label class="f">HISTORIA</label>
-      <div class="field story-field${done ? '' : ' empty-field'}" id="story-field">${done ? storyFieldHTML(s) + `<article class="story">${s.paras.map(p => `<p>${p}</p>`).join('')}</article>` : '<p class="note">El campo está vacío. Pulsa <b>BOT De Historia</b>.</p>'}</div>
+      <div class="field story-field${done ? '' : ' empty-field'}" id="story-field">${done ? storyFieldHTML(s) + `<article class="story">${s.paras.map(p => `<p>${p}</p>`).join('')}</article>` : '<p class="note">El campo está vacío. Pulsa <b>CONTAR HISTORIA</b>.</p>'}</div>
       <div id="epics-zone">${done ? epicsHTML(s.epics) : ''}</div>
       <div id="story-nav">${done ? nav(null, 1, 'Siguiente: contexto →') : ''}</div>
     </div>`;
