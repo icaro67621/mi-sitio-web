@@ -218,14 +218,27 @@ async function send(body) {
 }
 
 async function reset() {
-  const list = await sentIssues();
-  const del = await Promise.allSettled(list.map(i => jira('DELETE', `/rest/api/3/issue/${i.key}?deleteSubtasks=true`)));
-  const failed = list.filter((_, j) => del[j].status === 'rejected').map(i => i.key);
+  // Uno por uno y con reintentos: Jira rechaza borrados simultáneos de issues enlazados a la misma
+  // historia. Al final se vuelve a buscar por si el índice de búsqueda no mostraba alguno.
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  const deleted = [];
+  for (let round = 0; round < 3; round++) {
+    const list = (await sentIssues()).filter(i => !deleted.includes(i.key));
+    if (!list.length) break;
+    for (const i of list) {
+      for (let attempt = 0; attempt < 3; attempt++) {
+        try { await jira('DELETE', `/rest/api/3/issue/${i.key}?deleteSubtasks=true`); deleted.push(i.key); break; }
+        catch (e) { if (e.jiraStatus === 404) { deleted.push(i.key); break; } await sleep(400 * (attempt + 1)); }
+      }
+    }
+    await sleep(800);
+  }
   const content = await epicContent();
   const clean = stripSection(content);
   if (clean) await setEpic(clean);
-  if (failed.length) throw new HttpError(502, `No se pudieron borrar: ${failed.join(', ')} (¿la cuenta del token tiene permiso de borrar issues?).`);
-  return { deleted: list.map(i => i.key), epicRestored: !!clean, epic: { key: EPIC, url: browse(EPIC) } };
+  const left = (await sentIssues()).filter(i => !deleted.includes(i.key)); // el índice de búsqueda puede ir con retraso
+  if (left.length) throw new HttpError(502, `No se pudieron borrar: ${left.map(i => i.key).join(', ')}. Vuelve a pulsar «Dejar el laboratorio como antes».`);
+  return { deleted, epicRestored: !!clean, epic: { key: EPIC, url: browse(EPIC) } };
 }
 
 /* ---------- entrada HTTP ---------- */
