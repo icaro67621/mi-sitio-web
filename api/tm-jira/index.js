@@ -217,27 +217,40 @@ async function send(body) {
   };
 }
 
-async function reset() {
-  // Uno por uno y con reintentos: Jira rechaza borrados simultáneos de issues enlazados a la misma
-  // historia. Al final se vuelve a buscar por si el índice de búsqueda no mostraba alguno.
+/* Claves LSO-n citadas en la sección de seguridad de la épica (la escribe send). */
+function sectionKeys(content) {
+  const i = content.findIndex(n => n.type === 'heading' && (n.content || []).some(c => (c.text || '').includes(MARK)));
+  if (i < 0) return [];
+  const re = new RegExp(`\\b${PROJECT}-\\d+\\b`, 'g');
+  return JSON.stringify(content.slice(i)).match(re) || [];
+}
+
+async function reset(body) {
+  // La búsqueda JQL de Jira se indexa con retraso: si se restablece pocos segundos después de
+  // enviar, no devuelve todas las tareas. Por eso se juntan tres fuentes: la sección de la épica,
+  // las claves que recuerda la página y la búsqueda. Solo se borra lo que es del proyecto y lleva
+  // la etiqueta kora-tm. Uno por uno y con reintentos.
   const sleep = ms => new Promise(r => setTimeout(r, ms));
-  const deleted = [];
-  for (let round = 0; round < 3; round++) {
-    const list = (await sentIssues()).filter(i => !deleted.includes(i.key));
-    if (!list.length) break;
-    for (const i of list) {
-      for (let attempt = 0; attempt < 3; attempt++) {
-        try { await jira('DELETE', `/rest/api/3/issue/${i.key}?deleteSubtasks=true`); deleted.push(i.key); break; }
-        catch (e) { if (e.jiraStatus === 404) { deleted.push(i.key); break; } await sleep(400 * (attempt + 1)); }
-      }
-    }
-    await sleep(800);
-  }
+  const keyRe = new RegExp(`^${PROJECT}-\\d+$`);
+  const fromPage = Array.isArray(body.keys) ? body.keys.filter(k => typeof k === 'string' && keyRe.test(k)).slice(0, 50) : [];
   const content = await epicContent();
+  const deleted = [], left = [];
+  const del = async key => {
+    let issue;
+    try { issue = await jira('GET', `/rest/api/3/issue/${key}?fields=labels,project`); }
+    catch (e) { if (e.jiraStatus === 404) return; throw e; }
+    if (issue.fields.project.key !== PROJECT || !(issue.fields.labels || []).includes(LABEL)) return;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try { await jira('DELETE', `/rest/api/3/issue/${key}?deleteSubtasks=true`); deleted.push(key); return; }
+      catch (e) { if (e.jiraStatus === 404) return; await sleep(500 * (attempt + 1)); }
+    }
+    left.push(key);
+  };
+  const keys = new Set([...sectionKeys(content), ...fromPage, ...(await sentIssues()).map(i => i.key)]);
+  for (const k of keys) await del(k);
   const clean = stripSection(content);
   if (clean) await setEpic(clean);
-  const left = (await sentIssues()).filter(i => !deleted.includes(i.key)); // el índice de búsqueda puede ir con retraso
-  if (left.length) throw new HttpError(502, `No se pudieron borrar: ${left.map(i => i.key).join(', ')}. Vuelve a pulsar «Dejar el laboratorio como antes».`);
+  if (left.length) throw new HttpError(502, `No se pudieron borrar: ${left.join(', ')}. Vuelve a pulsar «Dejar el laboratorio como antes».`);
   return { deleted, epicRestored: !!clean, epic: { key: EPIC, url: browse(EPIC) } };
 }
 
@@ -255,7 +268,7 @@ module.exports = async function (context, req) {
     if (action === 'verify') return reply(200, { ok: true, epic: { key: EPIC, url: browse(EPIC) } });
     if (action === 'status') return reply(200, { issues: await sentIssues(), epic: { key: EPIC, url: browse(EPIC) } });
     if (action === 'send') return reply(201, await send(body));
-    if (action === 'reset') return reply(200, await reset());
+    if (action === 'reset') return reply(200, await reset(body));
     throw new HttpError(404, 'Acción no encontrada.');
   } catch (err) {
     if (err instanceof HttpError) return reply(err.status, { error: err.message, ...(err.extra || {}) });

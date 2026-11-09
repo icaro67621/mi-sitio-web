@@ -654,7 +654,7 @@ function vSpecs(){
     <div><h3>Supuestos que el equipo debe validar</h3><ul class="bounds">${allAssumptions(m).map(a => `<li>${esc(a)}</li>`).join('')}</ul></div>
     <div class="actions nav-row"><button class="btn ghost" data-go="4">← Volver a la tabla</button>${isDemo() ? '<button class="btn" id="to-real">Ahora con mi historia real →</button>' : ''}</div>
     <div class="jira-zone" id="jira-zone" aria-live="polite"></div>
-    <div class="reset-all" id="reset-all-zone"><button class="btn danger big" id="reset-all">⟲ Reiniciar todo el entorno</button><span class="note">Vuelve al inicio: borra la sesión de BOT Act y lo escrito en HISTORIA REAL.</span></div>
+    <div class="reset-all" id="reset-all-zone"><button class="btn danger big" id="reset-all">⟲ Reiniciar todo el entorno</button><span class="note">Vuelve al inicio: borra la sesión de BOT Act y lo escrito en HISTORIA REAL. No toca Jira: para eso usa «Dejar el laboratorio como antes del envío a Jira».</span></div>
   </div>`;
   const md = () => specsMarkdown(m, specs);
   $('#copy-md').onclick = () => {
@@ -766,7 +766,8 @@ async function resetJira(m, specs){
   if(!jiraKey && !(await askJiraKey('Ingresa la <b>llave del laboratorio</b> para borrar las tareas de seguridad y restaurar la épica.'))) return renderJira(m, specs);
   jiraBusy('Restableciendo Jira…');
   try{
-    const r = await jiraCall('reset');
+    const sent = jiraSent();
+    const r = await jiraCall('reset', {keys:sent && sent.issues ? sent.issues.map(i => i.key) : []});
     if(r.status === 401){ jiraKey = null; toast('La llave ya no es válida'); return renderJira(m, specs); }
     if(!r.ok) throw new Error(r.data.error || 'Error ' + r.status);
     setJiraSent(null); renderJira(m, specs);
