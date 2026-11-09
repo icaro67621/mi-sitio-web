@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/ciberseguridad/stride/stride.css?v=7" />
-  <link rel="stylesheet" href="/ciberseguridad/threat-model/tm.css?v=7" />
+  <link rel="stylesheet" href="/ciberseguridad/threat-model/tm.css?v=8" />
 </head>
 <body>
 
@@ -118,9 +118,23 @@
   </div>
 </dialog>
 
+<dialog id="jira-dlg" class="skill-dlg jira-dlg" aria-labelledby="jira-title">
+  <form id="jira-form">
+    <div class="kicker">LLAVE DE ACTIVACIÓN · JIRA</div>
+    <h2 id="jira-title">Enviar actividades a desarrollo</h2>
+    <p id="jira-msg">Ingresa la llave del laboratorio para actualizar Jira.</p>
+    <div class="key-row">
+      <input type="password" id="jira-key" autocomplete="off" spellcheck="false" placeholder="Llave del laboratorio" aria-label="Llave del laboratorio" required>
+      <button class="btn" type="submit" id="jira-ok">Continuar</button>
+      <button class="btn ghost" type="button" id="jira-cancel">Cancelar</button>
+    </div>
+    <p class="jira-err" id="jira-err" role="alert" hidden></p>
+  </form>
+</dialog>
+
 <div class="toast" id="toast" hidden></div>
 
-<script src="/ciberseguridad/threat-model/tm-data.js?v=7"></script>
-<script src="/ciberseguridad/threat-model/tm.js?v=7"></script>
+<script src="/ciberseguridad/threat-model/tm-data.js?v=8"></script>
+<script src="/ciberseguridad/threat-model/tm.js?v=8"></script>
 </body>
 </html>

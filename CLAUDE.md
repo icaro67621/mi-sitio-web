@@ -52,6 +52,15 @@ registrada abre el aviso "Los Tokens cuestan" (Kora holograma rojo, `#tokens-dlg
 y el resto de módulos en ese modo quedan para un desarrollo posterior (el código sigue en `tm.js`,
 bloqueado en `renderTop`/`go`).
 
+**Envío a Jira:** en "Specs del equipo", el botón "Enviar actividades de seguridad a desarrollo"
+pide la llave del laboratorio (solo su SHA-256 está en el servidor; `TM_JIRA_KEY` la sustituye) y
+llama a la Azure Function `api/tm-jira/index.js` (`/api/tm-jira/verify|status|send|reset`). `send`
+crea una Tarea por spec (etiqueta `kora-tm`) bajo la épica `LSO-1` del proyecto `LSO` en
+cami88.atlassian.net, la enlaza (Relates) con las historias HU-xx y añade a la épica la sección
+"Actividades de seguridad del threat model (Kora)". El botón "Dejar el laboratorio como antes" (`reset`)
+borra esas tareas y quita la sección. Requiere en Azure (Configuración → Variables de entorno)
+`JIRA_EMAIL` y `JIRA_API_TOKEN`; opcionales `JIRA_BASE_URL`, `JIRA_PROJECT`, `JIRA_EPIC`.
+
 ## Charla · Arquitectura de Ciberseguridad
 
 Página `/ciberseguridad/arquitectura/` (tarjeta en la sección Charlas). Por ahora es solo el

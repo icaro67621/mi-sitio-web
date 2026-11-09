@@ -653,6 +653,7 @@ function vSpecs(){
       </article>`; }).join('')}</div>
     <div><h3>Supuestos que el equipo debe validar</h3><ul class="bounds">${allAssumptions(m).map(a => `<li>${esc(a)}</li>`).join('')}</ul></div>
     <div class="actions nav-row"><button class="btn ghost" data-go="4">← Volver a la tabla</button>${isDemo() ? '<button class="btn" id="to-real">Ahora con mi historia real →</button>' : ''}</div>
+    <div class="jira-zone" id="jira-zone" aria-live="polite"></div>
     <div class="reset-all" id="reset-all-zone"><button class="btn danger big" id="reset-all">⟲ Reiniciar todo el entorno</button><span class="note">Vuelve al inicio: borra la sesión de BOT Act y lo escrito en HISTORIA REAL.</span></div>
   </div>`;
   const md = () => specsMarkdown(m, specs);
@@ -668,6 +669,7 @@ function vSpecs(){
     document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   };
   const tr = $('#to-real'); if(tr) tr.onclick = () => setMode('real');
+  renderJira(m, specs);
   $('#reset-all').onclick = () => {
     $('#reset-all-zone').innerHTML = `<span class="confirm">¿Reiniciar todo el entorno? <button class="btn danger" id="ra-yes">Sí, reiniciar</button><button class="btn ghost" id="ra-no">Cancelar</button></span>`;
     $('#ra-no').onclick = vSpecs;
@@ -681,6 +683,98 @@ function resetAll(){
   renderTop(); render(); say(SAY.demo[0]);
   window.scrollTo({top: 0, behavior: reduce ? 'auto' : 'smooth'});
   toast('Entorno reiniciado');
+}
+
+/* ---------- Enviar actividades de seguridad a Jira (Azure Function /api/tm-jira) ---------- */
+const JKEY = 'kora-tm-jira';
+let jiraKey = null; // solo en memoria: la llave no se guarda en el navegador
+const jiraSent = () => { try{ return JSON.parse(localStorage.getItem(JKEY)); }catch(e){ return null; } };
+const setJiraSent = v => { try{ v ? localStorage.setItem(JKEY, JSON.stringify(v)) : localStorage.removeItem(JKEY); }catch(e){} };
+const PRIO_TXT = {blk:'Bloqueante para producción', med:'Próximo sprint', low:'Backlog con seguimiento'};
+
+async function jiraCall(action, extra){
+  const r = await fetch('/api/tm-jira/' + action, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({key:jiraKey, ...extra})});
+  let d = {}; try{ d = await r.json(); }catch(e){}
+  return {status:r.status, ok:r.ok, data:d};
+}
+/* Pide la llave y la comprueba en el servidor antes de seguir. */
+function askJiraKey(msg){
+  return new Promise(resolve => {
+    const dlg = $('#jira-dlg'), inp = $('#jira-key'), err = $('#jira-err'), ok = $('#jira-ok');
+    $('#jira-msg').innerHTML = msg; err.hidden = true; inp.value = '';
+    const done = v => { dlg.close(); resolve(v); };
+    $('#jira-cancel').onclick = () => done(false);
+    dlg.oncancel = e => { e.preventDefault(); done(false); };
+    $('#jira-form').onsubmit = async e => {
+      e.preventDefault(); ok.disabled = true; err.hidden = true;
+      jiraKey = inp.value;
+      try{
+        const r = await jiraCall('verify');
+        if(r.ok) return done(true);
+        jiraKey = null; err.textContent = r.data.error || 'No se pudo verificar la llave.'; err.hidden = false;
+      }catch(x){ jiraKey = null; err.textContent = 'No hay conexión con la API del sitio.'; err.hidden = false; }
+      finally{ ok.disabled = false; }
+      inp.select();
+    };
+    dlg.showModal(); inp.focus();
+  });
+}
+function renderJira(m, specs){
+  const z = $('#jira-zone'); if(!z) return;
+  const sent = jiraSent();
+  if(!sent){
+    z.innerHTML = `<button class="btn jira-send" id="jira-send">📤 Enviar actividades de seguridad a desarrollo</button>
+      <span class="note">Crea en Jira una tarea por spec (${specs.length}) bajo la épica del sprint, enlazada a sus historias, y actualiza la épica. Requiere la llave del laboratorio.</span>`;
+    $('#jira-send').onclick = () => sendJira(m, specs);
+    return;
+  }
+  z.innerHTML = `<p class="jira-ok">✔ ${sent.issues.length} actividades de seguridad en Jira · épica <a href="${esc(sent.epic.url)}" target="_blank" rel="noopener">${esc(sent.epic.key)}</a></p>
+    <ul class="jira-list">${sent.issues.map(i => `<li><a href="${esc(i.url)}" target="_blank" rel="noopener">${esc(i.key)}</a><span>${esc(i.summary)}</span>${i.prio ? `<span class="prio-b ${esc(i.prio)}">${PRIO_TXT[i.prio] || ''}</span>` : ''}</li>`).join('')}</ul>
+    <div id="jira-reset-zone"><button class="btn danger" id="jira-reset">⟲ Dejar el laboratorio como antes del envío a Jira</button></div>
+    <span class="note">Borra estas tareas de Jira y quita la sección de seguridad de la épica.</span>`;
+  $('#jira-reset').onclick = () => {
+    $('#jira-reset-zone').innerHTML = `<span class="confirm">¿Borrar las ${sent.issues.length} tareas de Jira y restaurar la épica? <button class="btn danger" id="jr-yes">Sí, restablecer</button><button class="btn ghost" id="jr-no">Cancelar</button></span>`;
+    $('#jr-no').onclick = () => renderJira(m, specs);
+    $('#jr-yes').onclick = () => resetJira(m, specs);
+  };
+}
+function jiraBusy(txt){ const z = $('#jira-zone'); z.querySelectorAll('button').forEach(b => b.disabled = true); const n = document.createElement('span'); n.className = 'note'; n.textContent = txt; z.appendChild(n); }
+async function sendJira(m, specs){
+  if(!jiraKey && !(await askJiraKey('Ingresa la <b>llave del laboratorio</b> para enviar los specs de seguridad a la épica del sprint en Jira.'))) return;
+  jiraBusy('Kora está creando las tareas en Jira…');
+  say('Enviando los <b>specs de seguridad</b> al equipo de desarrollo: creo una tarea por spec en Jira, la enlazo con sus historias y actualizo la épica.');
+  const payload = {system:m.name || 'el sistema', threats:m.threats.length,
+    specs:specs.map(s => ({id:s.id, title:s.title, prio:specPriority(m, s)[0], covers:s.covers, hu:s.hu || [], req:s.req, ac:s.ac, test:s.test}))};
+  try{
+    const r = await jiraCall('send', payload);
+    if(r.status === 401){ jiraKey = null; toast('La llave ya no es válida'); return renderJira(m, specs); }
+    if(r.status === 409 && r.data.issues){
+      setJiraSent({epic:r.data.epic, issues:r.data.issues});
+      say('Estas actividades <b>ya estaban en Jira</b>. Si quieres repetir la demo, primero deja el laboratorio como antes.');
+      return renderJira(m, specs);
+    }
+    if(!r.ok) throw new Error(r.data.error || 'Error ' + r.status);
+    setJiraSent(r.data); renderJira(m, specs);
+    const nb = r.data.issues.filter(i => i.prio === 'blk').length;
+    say(`Listo: <b>${r.data.issues.length} tareas de seguridad</b> en Jira bajo la épica <b>${esc(r.data.epic.key)}</b>, ${nb} bloqueantes para producción. El equipo de desarrollo ya las tiene en su backlog.`);
+    toast('Jira actualizado');
+  }catch(e){
+    renderJira(m, specs); say('No pude actualizar Jira: ' + esc(e.message)); toast('No se pudo enviar a Jira');
+  }
+}
+async function resetJira(m, specs){
+  if(!jiraKey && !(await askJiraKey('Ingresa la <b>llave del laboratorio</b> para borrar las tareas de seguridad y restaurar la épica.'))) return renderJira(m, specs);
+  jiraBusy('Restableciendo Jira…');
+  try{
+    const r = await jiraCall('reset');
+    if(r.status === 401){ jiraKey = null; toast('La llave ya no es válida'); return renderJira(m, specs); }
+    if(!r.ok) throw new Error(r.data.error || 'Error ' + r.status);
+    setJiraSent(null); renderJira(m, specs);
+    say(`Laboratorio restablecido: borré ${r.data.deleted.length} tareas de Jira y la épica <b>${esc(r.data.epic.key)}</b> quedó como antes del envío.`);
+    toast('Jira restablecido');
+  }catch(e){
+    renderJira(m, specs); say('No pude restablecer Jira: ' + esc(e.message)); toast('No se pudo restablecer Jira');
+  }
 }
 
 /* Llave de escenario: aún no existen llaves reales, cualquier intento muestra el aviso. */
